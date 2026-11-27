@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0E0B09">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Budget">
+<title>Budget</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#0E0B09; --bg2:#16110D; --card:#1C1611; --card2:#241C15; --line:#33281F;
+  --text:#FFF4EA; --muted:#B5A595; --faint:#7D6E61;
+  --orange:#FF7A1A; --orange2:#FF9A3D; --deep:#E5520A;
+  --fix:#F26B0F; --save:#4F8CFF; --free:#2BB585; --danger:#FF5A5F;
+  --r:22px; --font: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+body{min-height:100vh;min-height:100dvh}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,select,textarea{font:inherit;font-size:16px;color:var(--text)}
+.hidden{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+
+/* Hintergrund-Glühen */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.glow::before,.glow::after{content:"";position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+.glow::before{width:420px;height:420px;background:radial-gradient(circle,#FF7A1A 0%,transparent 70%);top:-180px;right:-140px;animation:drift 18s ease-in-out infinite alternate}
+.glow::after{width:360px;height:360px;background:radial-gradient(circle,#B8360A 0%,transparent 70%);bottom:-160px;left:-160px;opacity:.35;animation:drift 22s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(-40px,60px) scale(1.15)}}
+
+/* ---------- Sperrbildschirm ---------- */
+#lock{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:calc(var(--safe-t) + 20px) 24px calc(var(--safe-b) + 20px);background:radial-gradient(120% 80% at 50% 0%,#2A170A 0%,var(--bg) 60%)}
+.logo{width:84px;height:84px;border-radius:26px;background:linear-gradient(145deg,var(--orange2),var(--deep));display:grid;place-items:center;box-shadow:0 20px 50px -10px rgba(255,122,26,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+.logo svg{width:50px;height:50px}
+#lock h1{margin:6px 0 0;font-size:28px;letter-spacing:-.5px}
+#lockMsg{color:var(--muted);font-size:15px;min-height:20px;text-align:center}
+.dots{display:flex;gap:14px;margin:8px 0 14px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--orange);transition:.15s}
+.dot.on{background:var(--orange);box-shadow:0 0 12px var(--orange)}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:16px}
+.key{height:76px;border-radius:50%;background:rgba(255,255,255,.06);font-size:30px;font-weight:500;transition:background .1s,transform .1s;backdrop-filter:blur(10px)}
+.key:active{background:rgba(255,122,26,.35);transform:scale(.94)}
+.key.ghost{background:none;font-size:17px;color:var(--muted)}
+.lock-note{color:var(--faint);font-size:12px;text-align:center;max-width:290px;line-height:1.4}
+
+/* ---------- App ---------- */
+#app{position:relative;z-index:1;padding:calc(var(--safe-t) + 14px) 18px calc(var(--safe-b) + 110px);max-width:560px;margin:0 auto}
+header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.hello{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:600}
+.title{font-size:30px;font-weight:700;letter-spacing:-.8px;margin-top:2px}
+.iconbtn{width:42px;height:42px;border-radius:14px;background:var(--card);display:grid;place-items:center;border:1px solid var(--line)}
+.iconbtn svg{width:20px;height:20px}
+.view{animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card h3{margin:0 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.card h3 small{text-transform:none;letter-spacing:0;font-weight:500;color:var(--faint);font-size:13px}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;background:linear-gradient(140deg,#FF8A2B 0%,#F0600C 55%,#B83A06 100%);border:0;color:#fff;padding:22px 20px 20px;box-shadow:0 24px 60px -20px rgba(255,110,20,.65)}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:34px solid rgba(255,255,255,.09)}
+.hero::before{content:"";position:absolute;right:40px;bottom:-90px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero .lbl{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.85}
+.hero .big{font-size:48px;font-weight:800;letter-spacing:-1.5px;margin:4px 0 2px;line-height:1.05}
+.hero .sub{font-size:14px;opacity:.9}
+.hero .row{display:flex;gap:8px;margin-top:16px;position:relative;z-index:1;flex-wrap:wrap}
+.pill{background:rgba(0,0,0,.18);backdrop-filter:blur(6px);border-radius:14px;padding:8px 12px;flex:1;min-width:92px}
+.pill b{display:block;font-size:16px}
+.pill span{font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+
+/* Ring */
+.ringwrap{display:flex;align-items:center;gap:14px}
+.ring{position:relative;width:128px;height:128px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .center b{font-size:26px;font-weight:800;letter-spacing:-1px;display:block}
+.ring .center span{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.seg{transition:stroke-dasharray .9s cubic-bezier(.2,.8,.2,1)}
+.legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.lg{display:flex;align-items:center;gap:8px;font-size:14px;white-space:nowrap}
+.lg i{width:10px;height:10px;border-radius:3px;flex:none}
+.lg .v{margin-left:auto;font-weight:700}
+.lg .p{color:var(--faint);font-size:12px;width:32px;text-align:right;flex:none}
+
+/* Balken */
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar .bt{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;gap:8px}
+.bar .bt span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .bt b{font-weight:700;white-space:nowrap}
+.bar .bt em{font-style:normal;color:var(--faint);font-size:12px;margin-left:6px}
+.track{height:10px;background:#2A211A;border-radius:6px;overflow:hidden}
+.fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--deep),var(--orange2));width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar{cursor:pointer}
+
+/* Listen */
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:last-child{border-bottom:0}
+.item:active{opacity:.6}
+.emo{width:42px;height:42px;border-radius:14px;background:var(--card2);display:grid;place-items:center;font-size:21px;flex:none;border:1px solid var(--line)}
+.item .meta{flex:1;min-width:0}
+.item .n{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .s{font-size:13px;color:var(--muted);margin-top:2px}
+.item .a{text-align:right;font-weight:700;font-size:16px;white-space:nowrap}
+.item .a small{display:block;color:var(--faint);font-weight:500;font-size:12px}
+.due{font-size:12px;font-weight:700;padding:4px 9px;border-radius:10px;background:rgba(255,122,26,.14);color:var(--orange2);white-space:nowrap}
+.due.today{background:var(--orange);color:#1a0d03}
+.empty{text-align:center;color:var(--muted);padding:22px 10px;font-size:15px;line-height:1.5}
+.empty .e{font-size:40px;display:block;margin-bottom:6px}
+.addrow{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;margin-top:6px;border-radius:14px;border:1.5px dashed #4A3A2C;color:var(--orange2);font-weight:700;font-size:15px}
+.grouphead{display:flex;align-items:center;gap:10px;margin:4px 0 2px}
+.grouphead .gn{font-weight:700;font-size:17px}
+.grouphead .gt{margin-left:auto;font-weight:700;color:var(--orange2)}
+.grouphead .gp{color:var(--faint);font-size:13px}
+
+.seg-ctl{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
+.seg-ctl button{flex:1;padding:9px 6px;border-radius:10px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg-ctl button.on{background:var(--orange);color:#1a0d03}
+
+/* Tabbar */
+nav.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--safe-b) + 12px);z-index:5;display:flex;gap:2px;padding:6px;max-width:calc(100vw - 20px);border-radius:26px;background:rgba(30,23,17,.82);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,.07);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:19px;font-size:10.5px;font-weight:700;color:var(--faint);min-width:62px;transition:.2s}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button.on{color:#1a0d03;background:linear-gradient(145deg,var(--orange2),var(--orange))}
+.fab{width:54px;height:54px;flex:none;border-radius:19px;background:linear-gradient(145deg,var(--orange2),var(--deep));color:#fff;display:grid;place-items:center;box-shadow:0 10px 26px -6px rgba(255,122,26,.8);align-self:center;margin:0 2px}
+.fab svg{width:26px;height:26px}
+.fab:active{transform:scale(.92)}
+
+/* Sheet */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(3px)}
+#scrim.on{opacity:1;pointer-events:auto}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:560px;margin:0 auto;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:28px 28px 0 0;padding:10px 20px calc(var(--safe-b) + 22px);transform:translateY(105%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),visibility 0s .32s;max-height:92vh;overflow-y:auto}
+#sheet.on{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.9,.25,1)}
+.grab{width:42px;height:5px;border-radius:3px;background:#4A3A2C;margin:0 auto 14px}
+#sheet h2{margin:0 0 16px;font-size:22px;letter-spacing:-.4px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px}
+.inp{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;outline:none;transition:border .15s;-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--orange)}
+.amount{font-size:34px!important;font-weight:800;text-align:center;letter-spacing:-1px;padding:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 13px;border-radius:13px;background:var(--card);border:1px solid var(--line);font-size:14px;font-weight:600}
+.chip.on{background:rgba(255,122,26,.18);border-color:var(--orange);color:var(--orange2)}
+.btn{width:100%;padding:15px;border-radius:16px;font-weight:800;font-size:17px;background:linear-gradient(145deg,var(--orange2),var(--deep));color:#fff;margin-top:6px;box-shadow:0 10px 24px -10px rgba(255,122,26,.8)}
+.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--card);color:var(--text);box-shadow:none;border:1px solid var(--line)}
+.btn.del{background:none;color:var(--danger);box-shadow:none}
+.hint{font-size:13px;color:var(--faint);line-height:1.45;margin:4px 0 12px}
+
+/* Einstellungen */
+.set{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:16px}
+.set:last-child{border-bottom:0}
+.set .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:17px;background:var(--card2)}
+.set .r{margin-left:auto;color:var(--faint);font-size:14px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.status.ok i{background:var(--free);box-shadow:0 0 8px var(--free)}
+.status.err i{background:var(--danger)}
+
+#toast{position:fixed;left:50%;top:calc(var(--safe-t) + 12px);transform:translate(-50%,-250%);visibility:hidden;z-index:60;background:#2A2018;border:1px solid var(--line);padding:11px 18px;border-radius:16px;font-weight:600;font-size:15px;transition:transform .35s cubic-bezier(.2,.9,.25,1);box-shadow:0 12px 30px rgba(0,0,0,.5);white-space:nowrap}
+#toast.on{transform:translate(-50%,0);visibility:visible}
+.burst{position:fixed;width:10px;height:10px;border-radius:3px;z-index:70;pointer-events:none}
+
+/* ---------- v2 Ergänzungen ---------- */
+:root{--loan:#B157E0; --var:#B88A0E; --inc:#8E9AA8}
+.hbtns{display:flex;gap:8px}
+.monthbar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:5px;margin-bottom:14px}
+.monthbar button{width:40px;height:36px;border-radius:12px;font-size:20px;color:var(--orange2);font-weight:700}
+.monthbar button:active{background:var(--card2)}
+.monthbar .ml{font-weight:800;font-size:16px;text-align:center}
+.monthbar .ml small{display:block;font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.banner{display:flex;gap:12px;align-items:center;background:rgba(255,122,26,.1);border:1px solid rgba(255,122,26,.35);border-radius:18px;padding:12px 14px;margin-bottom:14px;font-size:14px;line-height:1.35;cursor:pointer}
+.banner .be{font-size:24px}
+.banner b{color:var(--orange2)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:7px;background:rgba(255,255,255,.08);color:var(--muted);margin-left:6px;vertical-align:middle;text-transform:uppercase;letter-spacing:.5px}
+.tag.o{background:rgba(255,122,26,.18);color:var(--orange2)}
+.btnrow{display:flex;gap:8px;margin-top:10px}
+.btnrow .btn{margin:0;padding:12px;font-size:15px}
+.datehead{font-size:12px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.9px;margin:12px 0 0}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 14px;text-align:left;display:flex;flex-direction:column;gap:6px}
+.tile .te{font-size:26px}
+.tile b{font-size:15px}
+.tile span{font-size:12px;color:var(--muted);line-height:1.3}
+.tile.hi{background:linear-gradient(145deg,rgba(255,154,61,.22),rgba(229,82,10,.12));border-color:rgba(255,122,26,.45)}
+.chart svg{width:100%;height:auto;display:block}
+.chart .leg{display:flex;gap:14px;font-size:13px;color:var(--muted);margin-bottom:8px}
+.chart .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.chart .mcol{cursor:pointer}
+.goal{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.goal:last-child{border-bottom:0}
+.gring{width:62px;height:62px;flex:none;position:relative}
+.gring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gring .ge{position:absolute;inset:0;display:grid;place-items:center;font-size:24px}
+.goal .gm{flex:1;min-width:0}
+.goal .gn{font-weight:700;font-size:16px}
+.goal .gs{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.35}
+.goal .gp{font-weight:800;font-size:15px;color:var(--orange2);white-space:nowrap}
+.mini{font-size:12px;padding:7px 11px;border-radius:11px;background:var(--orange);color:#1a0d03;font-weight:800}
+.loan .lt{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.loan .ln{font-weight:700;font-size:17px}
+.loan .ll{font-size:13px;color:var(--muted)}
+.loan .lb{font-size:24px;font-weight:800;letter-spacing:-.6px;text-align:right}
+.loan .lb small{display:block;font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+.loan .track{margin:12px 0 8px}
+.loan .fill{background:linear-gradient(90deg,#7D33A8,var(--loan))}
+.kv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
+.kv div{background:var(--card2);border-radius:12px;padding:8px 10px}
+.kv span{display:block;font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.kv b{font-size:14px}
+.preview{background:var(--card);border:1px dashed #4A3A2C;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:12px}
+.preview b{color:var(--text)}
+.prog{height:8px;background:#2A211A;border-radius:5px;overflow:hidden;margin:10px 0 4px}
+.prog div{height:100%;background:linear-gradient(90deg,var(--deep),var(--orange2));width:0;transition:width .3s}
+.ocr-row{display:grid;grid-template-columns:28px 1fr auto;gap:8px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.ocr-row input[type=checkbox]{width:22px;height:22px;accent-color:var(--orange)}
+.ocr-row .on{font-weight:600;font-size:15px;background:none;border:0;border-bottom:1px solid transparent;padding:2px 0;width:100%;outline:none}
+.ocr-row .on:focus{border-bottom-color:var(--orange)}
+.ocr-row .oa{font-weight:800;white-space:nowrap}
+.ocr-row .ob{grid-column:2 / 4;display:flex;gap:8px}
+.ocr-row select,.ocr-row input[type=date]{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:14px;color:var(--text);-webkit-appearance:none;appearance:none}
+.ocr-row select{flex:1;min-width:0}
+.ocr-row input[type=date]{width:128px;flex:none;min-width:0}
+.ocr-row{overflow:hidden}
+.ocr-row.dup{opacity:.5}
+.ocr-row.inc .oa{color:var(--free)}
+.ocr-thumbs{display:flex;gap:8px;overflow-x:auto;margin-bottom:10px}
+.ocr-thumbs img{height:90px;border-radius:10px;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<section id="lock">
+  <div class="logo"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round"><path d="M24 6a18 18 0 1 1-17.3 13"/><path d="M30 17.5c-1.6-1.6-3.6-2.5-6-2.5-4.7 0-8.5 4-8.5 9s3.8 9 8.5 9c2.4 0 4.4-.9 6-2.5M12.5 21.5h12M12.5 27h10"/></svg></div>
+  <h1>Budget</h1>
+  <div id="lockMsg">PIN eingeben</div>
+  <div class="dots" id="dots"></div>
+  <div class="pad" id="pad"></div>
+  <div class="lock-note" id="lockNote"></div>
+</section>
+
+<main id="app" class="hidden">
+  <header class="top">
+    <div><div class="hello" id="hello">Hallo</div><div class="title" id="vtitle">Übersicht</div></div>
+    <div class="hbtns">
+      <button class="iconbtn" id="setBtn" aria-label="Einstellungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      <button class="iconbtn" id="lockBtn" aria-label="Sperren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+    </div>
+  </header>
+  <div id="view"></div>
+</main>
+
+<nav class="tabs hidden" id="tabs">
+  <button data-v="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Übersicht</button>
+  <button data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Monat</button>
+  <button class="fab" id="fab" aria-label="Neu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button data-v="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Fixkosten</button>
+  <button data-v="goals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Ziele</button>
+</nav>
+
+<div id="scrim"></div>
+<div id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
+<div id="toast"></div>
+<input type="file" id="fileIn" accept=".json,application/json" class="hidden">
+<input type="file" id="imgIn" accept="image/*" multiple class="hidden">
+
+<script>
+"use strict";
+/* =========================================================
+   Budget v2 – private Haushalts-App
+   Alle Daten: AES-256-GCM verschlüsselt im Browser.
+   Im Code (und damit auf GitHub) stehen KEINE persönlichen Zahlen.
+   ========================================================= */
+const APP_VERSION = "2.0";
+const VAULT = "budget.vault.v1";
+const PIN_LEN = 6, KDF_ITER = 310000, AUTOLOCK_MS = 60 * 1000;
+const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+const enc = new TextEncoder(), dec = new TextDecoder();
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eur = new Intl.NumberFormat("de-DE", {style:"currency", currency:"EUR"});
+const eur0 = new Intl.NumberFormat("de-DE", {style:"currency", currency:"EUR", maximumFractionDigits:0});
+const fmt = (v, round) => (round ? eur0 : eur).format(v || 0);
+const parseAmt = s => { const n = parseFloat(String(s).replace(/\s|€/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",", ".")); return isFinite(n) ? Math.round(n*100)/100 : 0; };
+const amtStr = v => v != null && v !== "" ? String(v).replace(".", ",") : "";
+
+/* ---------- Monate ---------- */
+const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const pad2 = n => String(n).padStart(2, "0");
+const ymOf = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; };
+const CUR = () => ymOf(new Date());
+const addM = (ym, n) => { const [y, m] = ym.split("-").map(Number); const d = new Date(y, m - 1 + n, 1); return ymOf(d); };
+const ymLabel = (ym, short) => { const [y, m] = ym.split("-").map(Number); return short ? MONTHS[m-1].slice(0,3) : `${MONTHS[m-1]} ${y}`; };
+const ymDiff = (a, b) => { const [ya, ma] = a.split("-").map(Number), [yb, mb] = b.split("-").map(Number); return (yb - ya) * 12 + (mb - ma); };
+const monthOptions = (sel, back = 24, fwd = 24, allowNone) => { let o = allowNone ? `<option value="">–</option>` : ""; for (let i = -back; i <= fwd; i++){ const m = addM(CUR(), i); o += `<option value="${m}" ${m===sel?"selected":""}>${ymLabel(m)}</option>`; } return o; };
+
+const INTERVALS = {
+  monthly:   {label:"monatlich",       step:1,  f:1},
+  quarterly: {label:"vierteljährlich", step:3,  f:1/3},
+  half:      {label:"halbjährlich",    step:6,  f:1/6},
+  yearly:    {label:"jährlich",        step:12, f:1/12},
+};
+const monthlyOf = it => (it.amount || 0) * (INTERVALS[it.interval]?.f ?? 1);
+
+const DEFAULT_CATS = [
+  {id:"wohnen", name:"Wohnen & Haushalt", emoji:"🏠"},
+  {id:"essen",  name:"Lebensmittel",      emoji:"🛒"},
+  {id:"mobil",  name:"Mobilität",         emoji:"🚗"},
+  {id:"vers",   name:"Versicherungen",    emoji:"🛡️"},
+  {id:"abo",    name:"Abos & Medien",     emoji:"📺"},
+  {id:"frei",   name:"Freizeit & Essen gehen", emoji:"🎮"},
+  {id:"shop",   name:"Shopping",          emoji:"🛍️"},
+  {id:"gesund", name:"Drogerie & Gesundheit", emoji:"💊"},
+  {id:"sparen", name:"Sparen",            emoji:"🐷", saving:true},
+  {id:"sonst",  name:"Sonstiges",         emoji:"📦"},
+];
+const emptyData = () => ({v:2, updatedAt:0, name:"", categories:structuredClone(DEFAULT_CATS), incomes:{}, fixed:[], loans:[], tx:[], goals:[], rules:{}, settings:{sync:null}});
+
+/* Bringt alte (v1) oder unvollständige Daten auf v2 */
+function normalize(o){
+  const d = {...emptyData(), ...(o || {})};
+  if (!o?.v || o.v < 2){
+    const m0 = CUR();
+    d.fixed = [...(o?.expenses || []).map(x => ({...x})), ...(o?.savings || []).map(x => ({...x, cat:"sparen"}))]
+      .map(x => ({interval:"monthly", ...x, id:x.id || uid(), amount: typeof x.amount === "number" ? x.amount : parseAmt(x.amount), from:x.from || m0, until:null}));
+    d.incomes = Array.isArray(o?.incomes) && o.incomes.length ? {[m0]: o.incomes.map(x => ({id:x.id || uid(), name:x.name, amount:monthlyOf({interval:"monthly", ...x})}))} : (o?.incomes && !Array.isArray(o.incomes) ? o.incomes : {});
+    delete d.expenses; delete d.savings; d.v = 2;
+  }
+  for (const k of ["fixed","loans","tx","goals"]) if (!Array.isArray(d[k])) d[k] = [];
+  if (!d.incomes || Array.isArray(d.incomes)) d.incomes = {};
+  if (!d.rules) d.rules = {};
+  if (!d.settings) d.settings = {sync:null};
+  if (!Array.isArray(d.categories) || !d.categories.length) d.categories = structuredClone(DEFAULT_CATS);
+  for (const c of DEFAULT_CATS) if (!d.categories.find(x => x.id === c.id) && ["sparen","sonst","shop","gesund"].includes(c.id)) d.categories.push(structuredClone(c));
+  const sp = d.categories.find(c => c.id === "sparen"); if (sp) sp.saving = true;
+  return d;
+}
+
+/* ---------- Krypto ---------- */
+const b64 = buf => { const a = new Uint8Array(buf); let s = ""; for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode.apply(null, a.subarray(i, i + 0x8000)); return btoa(s); };
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function deriveKey(secret, salt){
+  const base = await crypto.subtle.importKey("raw", enc.encode(secret), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt, iterations:KDF_ITER, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+}
+async function sealWith(key, obj){ const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, enc.encode(JSON.stringify(obj))); return {iv:b64(iv), ct:b64(ct)}; }
+async function openWith(key, box){ const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:unb64(box.iv)}, key, unb64(box.ct)); return JSON.parse(dec.decode(pt)); }
+async function sealPassword(pass, obj){ const salt = crypto.getRandomValues(new Uint8Array(16)); const key = await deriveKey(pass, salt); return {format:"budget-enc", v:2, salt:b64(salt), ...(await sealWith(key, obj))}; }
+async function openPassword(pass, box){ return openWith(await deriveKey(pass, unb64(box.salt)), box); }
+
+/* ---------- Zustand ---------- */
+let D = null, KEY = null, SALT = null, hiddenAt = 0, syncTimer = null, syncState = {ok:null, msg:"aus"};
+let SEL = CUR(), current = "home", fixTab = "fix";
+async function persist(touch = true){
+  if (touch) D.updatedAt = Date.now();
+  localStorage.setItem(VAULT, JSON.stringify({salt:b64(SALT), ...(await sealWith(KEY, D))}));
+  if (touch) scheduleSync();
+}
+
+/* ---------- Sperrbildschirm ---------- */
+let pinBuf = "", pinMode = "unlock", pinFirst = "";
+function buildPad(){
+  $("#dots").innerHTML = Array.from({length:PIN_LEN}, () => '<div class="dot"></div>').join("");
+  $("#pad").innerHTML = ["1","2","3","4","5","6","7","8","9","","0","⌫"].map(k => k === "" ? "<span></span>" : `<button class="key ${k==="⌫"?"ghost":""}" data-k="${k}">${k}</button>`).join("");
+  $("#pad").onclick = e => { const b = e.target.closest(".key"); if (b) pinKey(b.dataset.k); };
+  document.addEventListener("keydown", e => { if ($("#lock").classList.contains("hidden")) return; if (/^\d$/.test(e.key)) pinKey(e.key); else if (e.key === "Backspace") pinKey("⌫"); });
+}
+function drawDots(){ [...$("#dots").children].forEach((d,i) => d.classList.toggle("on", i < pinBuf.length)); }
+function failPin(msg){ $("#dots").classList.remove("shake"); void $("#dots").offsetWidth; $("#dots").classList.add("shake"); $("#lockMsg").textContent = msg; pinBuf = ""; setTimeout(drawDots, 200); }
+async function pinKey(k){
+  if (k === "⌫"){ pinBuf = pinBuf.slice(0,-1); drawDots(); return; }
+  if (pinBuf.length >= PIN_LEN) return;
+  pinBuf += k; drawDots();
+  if (pinBuf.length < PIN_LEN) return;
+  const pin = pinBuf;
+  if (pinMode === "setup1"){ pinFirst = pin; pinMode = "setup2"; pinBuf = ""; setTimeout(drawDots,150); $("#lockMsg").textContent = "PIN wiederholen"; return; }
+  if (pinMode === "setup2"){
+    if (pin !== pinFirst){ pinMode = "setup1"; failPin("Stimmt nicht überein – neue PIN wählen"); return; }
+    $("#lockMsg").textContent = "Verschlüssele …";
+    SALT = crypto.getRandomValues(new Uint8Array(16)); KEY = await deriveKey(pin, SALT);
+    D = normalize(D); await persist(false); pinBuf = ""; enterApp(true); return;
+  }
+  $("#lockMsg").textContent = "Entsperre …";
+  try{
+    const v = JSON.parse(localStorage.getItem(VAULT)); SALT = unb64(v.salt);
+    const key = await deriveKey(pin, SALT); const raw = await openWith(key, v);
+    KEY = key; D = normalize(raw); if (!raw.v || raw.v < 2) await persist(false);
+    pinBuf = ""; enterApp(false);
+  }catch(e){ failPin("Falsche PIN"); }
+}
+function showLock(mode){
+  pinMode = mode; pinBuf = ""; drawDots();
+  $("#lockMsg").textContent = mode === "unlock" ? "PIN eingeben" : "Wähle eine 6-stellige PIN";
+  $("#lockNote").textContent = mode === "unlock" ? "Deine Daten liegen verschlüsselt nur auf diesem Gerät." : "Mit dieser PIN werden deine Daten auf diesem Gerät verschlüsselt. Ohne PIN kommt niemand an deine Zahlen – auch du nicht. Merk sie dir gut.";
+  $("#lock").classList.remove("hidden"); $("#app").classList.add("hidden"); $("#tabs").classList.add("hidden"); closeSheet();
+}
+function lockNow(){ KEY = null; D = null; showLock("unlock"); }
+function enterApp(first){
+  $("#lock").classList.add("hidden"); $("#app").classList.remove("hidden"); $("#tabs").classList.remove("hidden");
+  SEL = CUR(); go("home"); if (first) toast("🔐 Tresor angelegt");
+  if (D.settings?.sync) pullSync(true);
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) hiddenAt = Date.now();
+  else if (KEY && hiddenAt && Date.now() - hiddenAt > AUTOLOCK_MS && !ocrBusy) lockNow();
+});
+
+/* ---------- Navigation ---------- */
+const TITLES = {home:"Übersicht", month:"Monat", fix:"Fixkosten", goals:"Sparziele", set:"Einstellungen"};
+function go(v){
+  current = v;
+  document.querySelectorAll("nav.tabs button[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  $("#vtitle").textContent = TITLES[v];
+  const h = new Date().getHours();
+  $("#hello").textContent = (h < 11 ? "Guten Morgen" : h < 18 ? "Hallo" : "Guten Abend") + (D.name ? ", " + D.name : "");
+  render(); window.scrollTo({top:0});
+}
+document.querySelectorAll("nav.tabs button[data-v]").forEach(b => b.onclick = () => go(b.dataset.v));
+$("#lockBtn").onclick = lockNow;
+$("#setBtn").onclick = () => go("set");
+$("#fab").onclick = openAddMenu;
+function setMonth(ym){ SEL = ym; render(); }
+function monthBar(){
+  const isCur = SEL === CUR();
+  return `<div class="monthbar"><button onclick="setMonth(addM(SEL,-1))" aria-label="Vormonat">‹</button><div class="ml" onclick="setMonth(CUR())">${ymLabel(SEL)}<small>${isCur ? "aktueller Monat" : ymDiff(CUR(), SEL) > 0 ? "Zukunft · Planung" : "Historie · tippen für heute"}</small></div><button onclick="setMonth(addM(SEL,1))" aria-label="Folgemonat">›</button></div>`;
+}
+
+/* ---------- Berechnungen ---------- */
+const cat = id => D.categories.find(c => c.id === id) || {id:"sonst", name:"Sonstiges", emoji:"📦"};
+const isSaving = id => !!cat(id).saving;
+const activeFixed = ym => D.fixed.filter(f => (f.from || "0000-00") <= ym && (!f.until || f.until >= ym));
+function incomesFor(ym){
+  if (Array.isArray(D.incomes[ym])) return {list:D.incomes[ym], est:false};
+  const prev = Object.keys(D.incomes).filter(k => k < ym && D.incomes[k].length).sort().pop();
+  return prev ? {list:D.incomes[prev], est:true, from:prev} : {list:[], est:false};
+}
+const txFor = ym => D.tx.filter(t => t.date.slice(0,7) === ym);
+
+/* Kredit: Restschuld & Rate je Monat (Annuität, Zins monatlich) */
+function loanCalc(l, ym){
+  if (ym < (l.from || l.asOf)) return {pay:0, bal:null};
+  if (ym <= l.asOf) return {pay:l.rate, bal: ym === l.asOf ? l.balance : null};
+  const r = (l.interest || 0) / 1200; let b = l.balance, m = l.asOf, pay = 0;
+  while (m < ym){ m = addM(m, 1); const i = b * r; pay = Math.min(l.rate, b + i); b = Math.max(0, b + i - pay); if (b <= 0.005 && m < ym){ return {pay:0, bal:0}; } }
+  return {pay, bal:b};
+}
+function loanPlan(l){
+  const r = (l.interest || 0) / 1200; let b = loanCalc(l, CUR()).bal ?? l.balance, m = CUR(), n = 0, interest = 0;
+  if (b > 0 && l.rate <= b * r) return {endless:true, bal:b};
+  while (b > 0.005 && n < 1200){ m = addM(m, 1); const i = b * r; interest += i; b = b + i - Math.min(l.rate, b + i); n++; }
+  return {bal: loanCalc(l, CUR()).bal ?? l.balance, months:n, end: n ? addM(CUR(), n) : CUR(), interest};
+}
+
+function summary(ym){
+  const inc = incomesFor(ym);
+  const fixed = activeFixed(ym);
+  let fix = 0, sav = 0; const perCat = new Map();
+  const addCat = (id, v) => { const c = cat(id); const e = perCat.get(c.id) || {c, sum:0, n:0}; e.sum += v; e.n++; perCat.set(c.id, e); };
+  fixed.forEach(f => { const v = monthlyOf(f); if (isSaving(f.cat)) sav += v; else fix += v; addCat(f.cat, v); });
+  const tx = txFor(ym); let vari = 0;
+  tx.forEach(t => { if (isSaving(t.cat)) sav += t.amount; else vari += t.amount; addCat(t.cat, t.amount); });
+  const loans = D.loans.reduce((s, l) => s + loanCalc(l, ym).pay, 0);
+  const income = inc.list.reduce((s, x) => s + (x.amount || 0), 0);
+  const out = fix + sav + vari + loans;
+  return {income, est:inc.est, estFrom:inc.from, fix, sav, vari, loans, out, free: income - out, perCat:[...perCat.values()].sort((a,b) => b.sum - a.sum), fixed, tx};
+}
+function nextDue(it, from = new Date()){
+  const step = INTERVALS[it.interval]?.step ?? 1, start = (it.month || 1) - 1, day = it.day || 1;
+  const today = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  for (let i = 0; i < 25; i++){
+    const mAbs = from.getMonth() + i, m = ((mAbs % 12) + 12) % 12;
+    if (step > 1 && (((m - start) % step) + step) % step !== 0) continue;
+    const yy = from.getFullYear() + Math.floor(mAbs / 12), last = new Date(yy, m + 1, 0).getDate();
+    const d = new Date(yy, m, Math.min(day, last)); if (d >= today) return d;
+  }
+  return null;
+}
+const daysUntil = d => Math.round((d - new Date(new Date().toDateString())) / 864e5);
+function goalInfo(g){
+  const rest = Math.max(0, g.target - (g.saved || 0)), pct = g.target ? Math.min(1, (g.saved || 0) / g.target) : 0;
+  let need = null, eta = null;
+  if (g.due){ const n = Math.max(1, ymDiff(CUR(), g.due)); need = rest / n; }
+  if (g.monthly > 0 && rest > 0) eta = addM(CUR(), Math.ceil(rest / g.monthly));
+  return {rest, pct, need, eta, done: rest <= 0};
+}
+
+/* ---------- Rendering ---------- */
+function render(){ ({home:renderHome, month:renderMonth, fix:renderFix, goals:renderGoals, set:renderSet})[current](); }
+const hasAnyData = () => Object.keys(D.incomes).length || D.fixed.length || D.tx.length || D.loans.length;
+
+function renderHome(){
+  const V = $("#view");
+  if (!hasAnyData()){
+    V.innerHTML = `<div class="view"><div class="card hero"><div class="lbl">Willkommen 👋</div><div class="big" style="font-size:30px">Lass uns starten</div><div class="sub">Trag dein Gehalt für ${ymLabel(CUR())} und deine Fixkosten ein. Danach siehst du hier jeden Monat, wo dein Geld bleibt.</div></div>
+      <button class="btn" onclick="editIncome()">💶 Gehalt eintragen</button>
+      <button class="btn sec" onclick="editFixed()">🏠 Erste Fixkosten</button>
+      <button class="btn sec" onclick="editLoan()">🏦 Kredit hinzufügen</button>
+      <button class="btn sec" onclick="importFile()">📥 Backup importieren</button></div>`;
+    return;
+  }
+  const s = summary(SEL);
+  const quote = s.income ? Math.round((s.out - s.sav) / s.income * 100) : 0;
+  const parts = [["Fixkosten", s.fix, "var(--fix)"], ["Kredite", s.loans, "var(--loan)"], ["Variabel", s.vari, "var(--var)"], ["Sparen", s.sav, "var(--save)"], [s.free >= 0 ? "Frei" : "Fehlbetrag", Math.abs(s.free), s.free >= 0 ? "var(--free)" : "var(--danger)"]].filter(p => p[1] > 0.004 || p[0] === "Frei");
+  const totalRing = parts.reduce((a, p) => a + p[1], 0) || 1, base = Math.max(s.income, s.out) || 1;
+  const R = 60, C = 2 * Math.PI * R, GAP = parts.length > 1 ? 3 : 0;
+  let off = 0;
+  const segs = parts.map(([n,v,col]) => { const len = v / totalRing * C; const x = `<circle class="seg" cx="75" cy="75" r="${R}" fill="none" stroke="${col}" stroke-width="18" stroke-dasharray="0 ${C}" data-len="${Math.max(0,len-GAP)}" data-c="${C}" style="stroke-dashoffset:${-off}"><title>${n}: ${fmt(v)}</title></circle>`; off += len; return x; }).join("");
+  const maxC = s.perCat[0]?.sum || 1;
+  const loanBars = s.loans > 0 ? [{c:{id:"_loan", name:"Kredite", emoji:"🏦"}, sum:s.loans, n:D.loans.length}] : [];
+  const bars = [...s.perCat, ...loanBars].sort((a,b) => b.sum - a.sum);
+  const maxB = bars[0]?.sum || maxC;
+  const isCur = SEL === CUR();
+  let upcoming = "";
+  if (isCur){
+    const list = [...s.fixed.map(x => ({x, kind:"fix", em:cat(x.cat).emoji})), ...D.loans.filter(l => loanCalc(l, SEL).pay > 0).map(l => ({x:{...l, amount:l.rate, interval:"monthly"}, kind:"loan", em:"🏦"}))]
+      .map(o => ({...o, d: nextDue(o.x)})).filter(o => o.d && o.x.day && daysUntil(o.d) <= 31).sort((a,b) => a.d - b.d).slice(0, 6);
+    upcoming = `<div class="card"><h3>Demnächst fällig <small>31 Tage</small></h3><div class="list">${list.map(({x,kind,em,d}) => { const dd = daysUntil(d);
+      return `<div class="item" onclick="${kind==="loan" ? `editLoan('${x.id}')` : `editFixed('${x.id}')`}"><div class="emo">${em}</div><div class="meta"><div class="n">${esc(x.name)}</div><div class="s">${d.toLocaleDateString("de-DE",{weekday:"short", day:"numeric", month:"short"})}</div></div><div style="text-align:right"><div class="a num">${fmt(x.amount)}</div><span class="due ${dd===0?"today":""}">${dd===0?"heute":dd===1?"morgen":"in "+dd+" Tagen"}</span></div></div>`; }).join("") || '<div class="empty">Nichts fällig 🎉<br><small>Trag bei Fixkosten einen Abbuchungstag ein.</small></div>'}</div></div>`;
+  }
+  const loanTotal = D.loans.reduce((a, l) => a + (loanPlan(l).bal || 0), 0);
+  V.innerHTML = `<div class="view">${monthBar()}
+    ${s.est && SEL <= CUR() ? `<div class="banner" onclick="incomeBanner()"><div class="be">💶</div><div>Gehalt für <b>${ymLabel(SEL)}</b> fehlt noch – ich rechne vorerst mit ${ymLabel(s.estFrom)}. <b>Jetzt eintragen ›</b></div></div>` : ""}
+    <div class="card hero">
+      <div class="lbl">${s.free >= 0 ? (isCur ? "Übrig diesen Monat" : "Übrig im " + ymLabel(SEL, true) + ".") : "Fehlbetrag"}</div>
+      <div class="big num" id="heroNum">${fmt(0, true)}</div>
+      <div class="sub">${s.est ? "Einnahmen geschätzt · " : ""}nach allen Ausgaben inkl. Sparen</div>
+      <div class="row">
+        <div class="pill"><span>Einnahmen</span><b class="num">${fmt(s.income, true)}</b></div>
+        <div class="pill"><span>Ausgaben</span><b class="num">${fmt(s.out - s.sav, true)}</b></div>
+        <div class="pill"><span>Gespart</span><b class="num">${fmt(s.sav, true)}</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Wohin dein Geld geht <small>${ymLabel(SEL)}</small></h3>
+      <div class="ringwrap">
+        <div class="ring"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="${R}" fill="none" stroke="#2A211A" stroke-width="18"/>${segs}</svg>
+          <div class="center"><div><b class="num">${quote}%</b><span>verbraucht</span></div></div></div>
+        <div class="legend">${parts.map(([n,v,col]) => `<div class="lg"><i style="background:${col}"></i>${n}<span class="v num">${fmt(v, true)}</span><span class="p num">${Math.round(v / base * 100)}%</span></div>`).join("")}</div>
+      </div>
+    </div>
+    ${historyChart()}
+    <div class="card">
+      <h3>Nach Kategorie <small>Fix + variabel</small></h3>
+      <div class="bars">${bars.map(g => `<div class="bar" onclick="${g.c.id==="_loan" ? "fixTab='loan';go('fix')" : "go('month')"}" title="${esc(g.c.name)}: ${fmt(g.sum)}"><div class="bt"><span>${g.c.emoji} ${esc(g.c.name)}<em>${g.n}×</em></span><b class="num">${fmt(g.sum)}<em>${s.income ? Math.round(g.sum / s.income * 100) : 0}%</em></b></div><div class="track"><div class="fill" data-w="${g.sum / maxB * 100}" ${g.c.saving ? 'style="background:var(--save)"' : g.c.id==="_loan" ? 'style="background:var(--loan)"' : ""}></div></div></div>`).join("") || '<div class="empty">Noch keine Ausgaben in diesem Monat</div>'}</div>
+    </div>
+    ${upcoming}
+    ${D.loans.length ? `<div class="card" onclick="fixTab='loan';go('fix')" style="cursor:pointer"><h3>Kredite <small>${D.loans.length} laufend ›</small></h3><div class="kv"><div><span>Restschuld</span><b class="num">${fmt(loanTotal, true)}</b></div><div><span>Rate/Monat</span><b class="num">${fmt(s.loans, true)}</b></div><div><span>Schuldenfrei</span><b>${(() => { const ends = D.loans.map(loanPlan).filter(p => !p.endless && p.months); return ends.length ? ymLabel(ends.sort((a,b) => b.months - a.months)[0].end, true) + " " + ends.sort((a,b) => b.months - a.months)[0].end.slice(0,4) : "–"; })()}</b></div></div></div>` : ""}
+    ${D.goals.length ? `<div class="card"><h3>Sparziele <small onclick="go('goals')" style="cursor:pointer">alle ›</small></h3>${D.goals.slice(0,3).map(goalRow).join("")}</div>` : ""}
+  </div>`;
+  animate(s.free);
+}
+function historyChart(){
+  const end = SEL > CUR() ? SEL : CUR();
+  const first = [...Object.keys(D.incomes), ...D.tx.map(t => t.date.slice(0,7)), ...D.fixed.map(f => f.from)].filter(Boolean).sort()[0] || end;
+  const months = []; for (let i = 5; i >= 0; i--){ const m = addM(end, -i); if (m >= first) months.push(m); }
+  if (months.length < 2) return "";
+  const data = months.map(m => ({m, ...summary(m)}));
+  const max = Math.max(...data.map(d => Math.max(d.income, d.out)), 1);
+  const W = 320, H = 140, top = 14, bot = 22, ch = H - top - bot, gw = W / months.length, bw = Math.min(16, gw * 0.28);
+  const bar = (x, v, col, est, label) => { const h = Math.max(2, v / max * ch), y = top + ch - h, r = Math.min(4, h / 2, bw / 2);
+    return `<path d="M${x},${top+ch} V${y+r} Q${x},${y} ${x+r},${y} H${x+bw-r} Q${x+bw},${y} ${x+bw},${y+r} V${top+ch} Z" fill="${col}" opacity="${est ? .4 : 1}"><title>${label}</title></path>`; };
+  const cols = data.map((d, i) => { const cx = gw * i + gw / 2, sel = d.m === SEL;
+    return `<g class="mcol" onclick="setMonth('${d.m}')">${sel ? `<rect x="${gw*i+3}" y="2" width="${gw-6}" height="${H-4}" rx="10" fill="rgba(255,122,26,.10)"/>` : ""}<rect x="${gw*i}" y="0" width="${gw}" height="${H}" fill="transparent"/>
+      ${bar(cx - bw - 1, d.income, "var(--inc)", d.est, `${ymLabel(d.m)} – Einnahmen: ${fmt(d.income)}${d.est ? " (geschätzt)" : ""}`)}
+      ${bar(cx + 1, d.out, "var(--fix)", false, `${ymLabel(d.m)} – Ausgaben inkl. Sparen: ${fmt(d.out)} · übrig ${fmt(d.free)}`)}
+      <text x="${cx}" y="${H-6}" text-anchor="middle" font-size="11" font-weight="${sel?800:600}" fill="${sel ? "var(--orange2)" : "var(--faint)"}">${ymLabel(d.m, true)}</text></g>`; }).join("");
+  return `<div class="card chart"><h3>Verlauf <small>tippe einen Monat</small></h3>
+    <div class="leg"><span><i style="background:var(--inc)"></i>Einnahmen</span><span><i style="background:var(--fix)"></i>Ausgaben inkl. Sparen</span></div>
+    <svg viewBox="0 0 ${W} ${H}"><line x1="0" x2="${W}" y1="${top+ch}" y2="${top+ch}" stroke="#33281F"/><line x1="0" x2="${W}" y1="${top}" y2="${top}" stroke="#241C15" stroke-dasharray="3 4"/><text x="${W}" y="${top-4}" text-anchor="end" font-size="10" fill="var(--faint)">${fmt(max, true)}</text>${cols}</svg>
+    <div class="list" style="margin-top:6px">${data.slice().reverse().slice(0,3).map(d => `<div class="lg" style="padding:4px 0">${ymLabel(d.m)}${d.est ? '<span class="tag">geschätzt</span>' : ""}<span class="v num" style="color:${d.free >= 0 ? "var(--free)" : "var(--danger)"}">${d.free >= 0 ? "+" : ""}${fmt(d.free, true)}</span></div>`).join("")}</div></div>`;
+}
+function animate(target){
+  requestAnimationFrame(() => {
+    document.querySelectorAll(".seg").forEach(s => s.style.strokeDasharray = `${s.dataset.len} ${s.dataset.c}`);
+    document.querySelectorAll(".fill").forEach(f => f.style.width = f.dataset.w + "%");
+    document.querySelectorAll(".gseg").forEach(s => s.style.strokeDasharray = `${s.dataset.len} 999`);
+  });
+  const el = $("#heroNum"); if (!el) return;
+  const t0 = performance.now();
+  const step = now => { const p = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(Math.abs(target) * e, true); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+
+/* Monat: Einnahmen + variable Ausgaben */
+function renderMonth(){
+  const s = summary(SEL), inc = incomesFor(SEL);
+  const groups = {}; s.tx.slice().sort((a,b) => b.date.localeCompare(a.date)).forEach(t => (groups[t.date] = groups[t.date] || []).push(t));
+  const varCats = {}; s.tx.forEach(t => { varCats[t.cat] = (varCats[t.cat] || 0) + t.amount; });
+  $("#view").innerHTML = `<div class="view">${monthBar()}
+    <div class="card"><h3>Einnahmen <small class="num">${fmt(s.income)}</small></h3>
+      ${inc.est ? `<p class="hint" style="margin-top:0">Noch nichts für ${ymLabel(SEL)} eingetragen. Unten siehst du die Werte aus ${ymLabel(inc.from)}.</p>` : ""}
+      <div class="list">${inc.list.map(x => `<div class="item" onclick="editIncome('${x.id}')"><div class="emo">💶</div><div class="meta"><div class="n">${esc(x.name)}${inc.est ? '<span class="tag o">geschätzt</span>' : ""}</div><div class="s">${x.note ? esc(x.note) : ymLabel(SEL)}</div></div><div class="a num" style="color:var(--free)">+${fmt(x.amount)}</div></div>`).join("") || '<div class="empty"><span class="e">💶</span>Noch keine Einnahmen</div>'}</div>
+      <div class="btnrow">${inc.est ? `<button class="btn sec" onclick="confirmIncomes()">✓ Übernehmen</button>` : ""}<button class="btn" onclick="editIncome()">＋ Einnahme</button></div>
+    </div>
+    <div class="card"><h3>Variable Ausgaben <small class="num">${fmt(s.vari + s.tx.filter(t => isSaving(t.cat)).reduce((a,t) => a + t.amount, 0))}</small></h3>
+      <div class="btnrow" style="margin-top:0;margin-bottom:6px"><button class="btn" onclick="startOCR()">📷 Screenshot einlesen</button><button class="btn sec" onclick="editTx()">＋ Ausgabe</button></div>
+      ${Object.keys(varCats).length ? `<div class="chips" style="margin:10px 0 2px">${Object.entries(varCats).sort((a,b) => b[1]-a[1]).map(([c,v]) => `<span class="chip">${cat(c).emoji} <b class="num">${fmt(v, true)}</b></span>`).join("")}</div>` : ""}
+      ${Object.entries(groups).map(([d, list]) => `<div class="datehead">${new Date(d + "T12:00").toLocaleDateString("de-DE", {weekday:"long", day:"numeric", month:"long"})}</div><div class="list">${list.map(t => `<div class="item" onclick="editTx('${t.id}')"><div class="emo">${cat(t.cat).emoji}</div><div class="meta"><div class="n">${esc(t.name)}</div><div class="s">${esc(cat(t.cat).name)}${t.src === "ocr" ? " · 📷" : ""}</div></div><div class="a num">${fmt(t.amount)}</div></div>`).join("")}</div>`).join("") || '<div class="empty"><span class="e">🧾</span>Noch keine variablen Ausgaben.<br><small>Screenshot aus der Banking-App einlesen oder manuell erfassen.</small></div>'}
+    </div>
+    <div class="card" style="cursor:pointer" onclick="go('fix')"><h3>Fixkosten & Kredite <small>›</small></h3><div class="legend">
+      <div class="lg"><i style="background:var(--fix)"></i>Fixkosten<span class="v num">${fmt(s.fix)}</span></div>
+      <div class="lg"><i style="background:var(--save)"></i>Sparen (fest)<span class="v num">${fmt(s.fixed.filter(f => isSaving(f.cat)).reduce((a,f) => a + monthlyOf(f), 0))}</span></div>
+      <div class="lg"><i style="background:var(--loan)"></i>Kreditraten<span class="v num">${fmt(s.loans)}</span></div></div></div>
+  </div>`;
+}
+
+/* Fixkosten & Kredite */
+function fixRow(x){
+  const iv = INTERVALS[x.interval] || INTERVALS.monthly;
+  const when = x.day ? ` · am ${x.day}.${x.interval !== "monthly" ? " " + MONTHS[(x.month||1)-1].slice(0,3) + "." : ""}` : "";
+  const ver = x.from > (D.fixed.filter(f => f.name === x.name).map(f => f.from).sort()[0] || x.from) ? `<span class="tag">seit ${ymLabel(x.from, true)}.</span>` : "";
+  return `<div class="item" onclick="editFixed('${x.id}')"><div class="emo">${cat(x.cat).emoji}</div><div class="meta"><div class="n">${esc(x.name)}${ver}</div><div class="s">${iv.label}${when}${x.until ? " · endet " + ymLabel(x.until, true) + "." : ""}${x.note ? " · " + esc(x.note) : ""}</div></div><div class="a num">${fmt(x.amount)}${x.interval !== "monthly" ? `<small>${fmt(monthlyOf(x))} / Monat</small>` : ""}</div></div>`;
+}
+function loanCard(l){
+  const c = loanCalc(l, SEL), p = loanPlan(l), bal = p.bal;
+  const paidPct = l.original ? Math.max(0, Math.min(100, (1 - bal / l.original) * 100)) : null;
+  return `<div class="card loan" onclick="editLoan('${l.id}')" style="cursor:pointer"><div class="lt"><div><div class="ln">🏦 ${esc(l.name)}</div><div class="ll">${esc(l.lender || "")}${l.interest ? (l.lender ? " · " : "") + String(l.interest).replace(".", ",") + " % Zins" : ""}</div></div><div class="lb num">${fmt(bal, true)}<small>Restschuld</small></div></div>
+    ${paidPct != null ? `<div class="track"><div class="fill" data-w="${paidPct}"></div></div><div class="ll">${Math.round(paidPct)} % von ${fmt(l.original, true)} getilgt</div>` : ""}
+    <div class="kv"><div><span>Rate</span><b class="num">${fmt(l.rate, true)}</b></div><div><span>Noch</span><b>${p.endless ? "∞" : p.months + " Raten"}</b></div><div><span>Fertig</span><b>${p.endless ? "Rate zu klein" : p.months ? ymLabel(p.end, true) + " " + p.end.slice(0,4) : "✓"}</b></div></div>
+    ${l.interest && !p.endless && p.interest > 1 ? `<div class="ll" style="margin-top:8px">Noch ca. ${fmt(p.interest, true)} Zinsen bis zum Ende</div>` : ""}
+    ${c.pay === 0 && SEL >= (l.from || l.asOf) ? `<div class="ll" style="margin-top:8px;color:var(--free)">🎉 In ${ymLabel(SEL)} abbezahlt</div>` : ""}</div>`;
+}
+function renderFix(){
+  const s = summary(SEL);
+  const groups = new Map(); s.fixed.forEach(f => { const c = cat(f.cat); const g = groups.get(c.id) || {c, sum:0, items:[]}; g.sum += monthlyOf(f); g.items.push(f); groups.set(c.id, g); });
+  const sorted = [...groups.values()].sort((a,b) => (a.c.saving - b.c.saving) || (b.sum - a.sum));
+  const fixAll = s.fix + s.fixed.filter(f => isSaving(f.cat)).reduce((a,f) => a + monthlyOf(f), 0);
+  $("#view").innerHTML = `<div class="view">${monthBar()}
+    <div class="seg-ctl"><button class="${fixTab==="fix"?"on":""}" onclick="fixTab='fix';render()">Fixkosten</button><button class="${fixTab==="loan"?"on":""}" onclick="fixTab='loan';render()">Kredite</button></div>
+    ${fixTab === "fix" ? `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><div class="hello">Fix / Monat</div><div style="font-size:30px;font-weight:800;letter-spacing:-1px" class="num">${fmt(fixAll)}</div></div><div style="text-align:right"><div class="hello">pro Jahr</div><div style="font-size:18px;font-weight:700" class="num">${fmt(fixAll*12, true)}</div></div></div>
+      ${sorted.map(g => `<div class="card"><div class="grouphead"><div class="emo">${g.c.emoji}</div><div><div class="gn">${esc(g.c.name)}</div><div class="gp">${g.c.saving ? "zählt als Ausgabe" : (fixAll ? Math.round(g.sum / fixAll * 100) : 0) + "% der Fixkosten"}</div></div><div class="gt num">${fmt(g.sum)}</div></div><div class="list">${g.items.sort((a,b) => monthlyOf(b) - monthlyOf(a)).map(fixRow).join("")}</div></div>`).join("") || `<div class="card"><div class="empty"><span class="e">🏠</span>Keine Fixkosten in ${ymLabel(SEL)}</div></div>`}
+      <button class="addrow" onclick="editFixed()">＋ Fixkosten / Sparrate</button>
+      <p class="hint" style="text-align:center;margin-top:12px">Änderungen gelten ab dem gewählten Monat – frühere Monate bleiben in der Historie unverändert.</p>`
+    : `${D.loans.map(loanCard).join("") || '<div class="card"><div class="empty"><span class="e">🏦</span>Keine laufenden Kredite.<br><small>Autokredit, Ratenkauf, 0 %-Finanzierung …</small></div></div>'}
+      <button class="addrow" onclick="editLoan()">＋ Kredit / Abzahlung</button>`}
+  </div>`;
+  animate(0);
+}
+
+/* Sparziele */
+function goalRow(g){
+  const gi = goalInfo(g), C = 2 * Math.PI * 25;
+  const sub = gi.done ? "🎉 Ziel erreicht!" : [g.due ? `bis ${ymLabel(g.due)} · ${fmt(gi.need, true)}/Monat nötig` : null, g.monthly ? `bei ${fmt(g.monthly, true)}/Monat fertig ${ymLabel(gi.eta)}` : null].filter(Boolean).join("<br>") || `noch ${fmt(gi.rest, true)}`;
+  return `<div class="goal" onclick="editGoal('${g.id}')"><div class="gring"><svg viewBox="0 0 62 62"><circle cx="31" cy="31" r="25" fill="none" stroke="#2A211A" stroke-width="7"/><circle class="gseg" cx="31" cy="31" r="25" fill="none" stroke="${gi.done ? "var(--free)" : "var(--orange)"}" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 999" data-len="${gi.pct * C}"/></svg><div class="ge">${esc(g.emoji || "🎯")}</div></div>
+    <div class="gm"><div class="gn">${esc(g.name)}</div><div class="gs num">${fmt(g.saved, true)} von ${fmt(g.target, true)}<br>${sub}</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="gp num">${Math.round(gi.pct*100)}%</div>${gi.done ? "" : `<button class="mini" onclick="event.stopPropagation();depositGoal('${g.id}')">＋ €</button>`}</div></div>`;
+}
+function renderGoals(){
+  const tot = D.goals.reduce((a,g) => a + (g.saved||0), 0), tgt = D.goals.reduce((a,g) => a + (g.target||0), 0);
+  $("#view").innerHTML = `<div class="view">
+    ${D.goals.length ? `<div class="card hero"><div class="lbl">Für deine Ziele gespart</div><div class="big num" id="heroNum">0 €</div><div class="sub">von insgesamt ${fmt(tgt, true)} · ${D.goals.filter(g => goalInfo(g).done).length} von ${D.goals.length} erreicht</div></div>
+      <div class="card">${D.goals.map(goalRow).join("")}</div>` : `<div class="card"><div class="empty"><span class="e">🎯</span>Noch keine Sparziele.<br><small>Urlaub, neues Handy, Notgroschen – du legst fest, wofür und wie viel.</small></div></div>`}
+    <button class="addrow" onclick="editGoal()">＋ Sparziel anlegen</button>
+  </div>`;
+  animate(tot);
+}
+
+/* Einstellungen */
+function renderSet(){
+  const s = D.settings.sync;
+  $("#view").innerHTML = `<div class="view">
+    <div class="card"><h3>Allgemein</h3>
+      <div class="set" onclick="editName()"><div class="ic">👋</div>Dein Name<span class="r">${esc(D.name) || "–"}</span></div>
+      <div class="set" onclick="editCats()"><div class="ic">🏷️</div>Kategorien<span class="r">${D.categories.length} ›</span></div>
+      <div class="set" onclick="resetRules()"><div class="ic">🧠</div>Gelernte Händler<span class="r">${Object.keys(D.rules).length} ›</span></div>
+    </div>
+    <div class="card"><h3>Sync über GitHub</h3>
+      <div class="set" onclick="editSync()"><div class="ic">☁️</div>Einrichten<span class="r"><span class="status ${syncState.ok===true?"ok":syncState.ok===false?"err":""}"><i></i>${esc(s ? syncState.msg : "aus")}</span></span></div>
+      ${s ? `<div class="set" onclick="pushSync()"><div class="ic">⬆️</div>Jetzt hochladen</div><div class="set" onclick="pullSync(false)"><div class="ic">⬇️</div>Vom Server laden</div>` : ""}
+    </div>
+    <div class="card"><h3>Sicherheit & Daten</h3>
+      <div class="set" onclick="changePin()"><div class="ic">🔑</div>PIN ändern</div>
+      <div class="set" onclick="exportFile()"><div class="ic">📤</div>Verschlüsseltes Backup exportieren</div>
+      <div class="set" onclick="importFile()"><div class="ic">📥</div>Backup importieren</div>
+      <div class="set" onclick="wipe()" style="color:var(--danger)"><div class="ic">🗑️</div>Alle Daten auf diesem Gerät löschen</div>
+    </div>
+    <p class="hint" style="text-align:center">Budget ${APP_VERSION} · AES-256 · Auto-Sperre nach 1 Min.<br>Zuletzt geändert: ${D.updatedAt ? new Date(D.updatedAt).toLocaleString("de-DE") : "–"}</p>
+  </div>`;
+}
+
+/* ---------- Sheet ---------- */
+function openSheet(html){ $("#sheetBody").innerHTML = html; $("#scrim").classList.add("on"); $("#sheet").classList.add("on"); $("#sheet").scrollTop = 0; }
+function closeSheet(){ $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
+$("#scrim").onclick = () => { if (!ocrBusy) closeSheet(); };
+let touchY = null;
+$("#sheet").addEventListener("touchstart", e => { if ($("#sheet").scrollTop <= 0 && !e.target.closest("input,select,textarea")) touchY = e.touches[0].clientY; }, {passive:true});
+$("#sheet").addEventListener("touchend", e => { if (touchY !== null && e.changedTouches[0].clientY - touchY > 90 && !ocrBusy) closeSheet(); touchY = null; });
+const chipPick = (sel, cb) => { $(sel).onclick = e => { const b = e.target.closest(".chip"); if (!b) return; $(sel).querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b)); cb && cb(); }; };
+const catChips = (selId, onlySaving) => D.categories.filter(c => onlySaving == null || !!c.saving === onlySaving).map(c => `<button class="chip ${c.id===selId?"on":""}" data-id="${c.id}">${c.emoji} ${esc(c.name)}</button>`).join("");
+function shakeEl(el){ el.focus(); el.classList.add("shake"); setTimeout(() => el.classList.remove("shake"), 400); }
+function confirmBtn(btn, label, fn){ btn.onclick = () => { if (btn.dataset.sure !== "1"){ btn.dataset.sure = "1"; btn.textContent = label; return; } fn(); }; }
+
+function openAddMenu(){
+  openSheet(`<h2>Was möchtest du erfassen?</h2><div class="tiles">
+    <button class="tile hi" onclick="editTx()"><span class="te">🧾</span><b>Ausgabe</b><span>Einkauf, Tanken, Essen gehen …</span></button>
+    <button class="tile hi" onclick="startOCR()"><span class="te">📷</span><b>Screenshot</b><span>Umsätze aus der Banking-App einlesen</span></button>
+    <button class="tile" onclick="editIncome()"><span class="te">💶</span><b>Einnahme</b><span>Gehalt für ${ymLabel(SEL)}</span></button>
+    <button class="tile" onclick="editFixed()"><span class="te">🏠</span><b>Fixkosten</b><span>Miete, Abos, Sparrate …</span></button>
+    <button class="tile" onclick="editLoan()"><span class="te">🏦</span><b>Kredit</b><span>Abzahlung mit Restschuld</span></button>
+    <button class="tile" onclick="editGoal()"><span class="te">🎯</span><b>Sparziel</b><span>Wofür sparst du?</span></button>
+  </div>`);
+}
+
+/* Einnahmen */
+async function materializeIncomes(){ const inc = incomesFor(SEL); if (inc.est) D.incomes[SEL] = inc.list.map(x => ({...x, id:uid()})); else if (!D.incomes[SEL]) D.incomes[SEL] = []; return inc; }
+function incomeBanner(){ const inc = incomesFor(SEL); if (inc.est && inc.list.length === 1) editIncome(inc.list[0].id); else go("month"); }
+async function confirmIncomes(){ await materializeIncomes(); await persist(); toast("✓ Einnahmen übernommen"); render(); }
+function editIncome(id){
+  const inc = incomesFor(SEL);
+  const x = id ? inc.list.find(i => i.id === id) : {name: !Object.keys(D.incomes).length ? "Gehalt" : ""};
+  const suggestions = [...new Set(Object.values(D.incomes).flat().map(i => i.name))].slice(0, 6);
+  openSheet(`<h2>${id ? "Einnahme" : "Neue Einnahme"} · ${ymLabel(SEL, true)}. ${SEL.slice(0,4)}</h2>
+    ${inc.est && id ? `<p class="hint">Wert aus ${ymLabel(inc.from)} – trag den tatsächlichen Betrag für ${ymLabel(SEL)} ein.</p>` : ""}
+    <div class="field"><input class="inp amount num" id="fAmt" inputmode="decimal" placeholder="0,00 €" value="${inc.est ? "" : amtStr(x.amount)}"></div>
+    ${inc.est && id ? `<p class="hint" style="text-align:center;margin-top:-6px">Letzter Monat: ${fmt(x.amount)}</p>` : ""}
+    <div class="field"><label>Bezeichnung</label><input class="inp" id="fName" value="${esc(x.name)}" placeholder="z. B. Gehalt" maxlength="60"></div>
+    ${!id && suggestions.length ? `<div class="chips" id="sugg" style="margin:-4px 0 14px">${suggestions.map(n => `<button class="chip">${esc(n)}</button>`).join("")}</div>` : ""}
+    <div class="field"><label>Notiz</label><input class="inp" id="fNote" value="${esc(x.note)}" placeholder="z. B. inkl. Überstunden" maxlength="80"></div>
+    <button class="btn" id="fSave">Speichern</button>${id ? '<button class="btn del" id="fDel">Löschen</button>' : ""}`);
+  if ($("#sugg")) $("#sugg").onclick = e => { const b = e.target.closest(".chip"); if (b) $("#fName").value = b.textContent; };
+  setTimeout(() => $("#fAmt").focus(), 350);
+  $("#fSave").onclick = async e => {
+    const amount = parseAmt($("#fAmt").value), name = $("#fName").value.trim();
+    if (!amount) return shakeEl($("#fAmt")); if (!name) return shakeEl($("#fName"));
+    const wasEst = inc.est, idx = id ? inc.list.findIndex(i => i.id === id) : -1;
+    await materializeIncomes();
+    const obj = {id: uid(), name, amount, note: $("#fNote").value.trim()};
+    if (idx >= 0){ obj.id = D.incomes[SEL][idx].id; D.incomes[SEL][idx] = obj; } else D.incomes[SEL].push(obj);
+    await persist(); closeSheet(); burst(e); toast(wasEst ? "💶 " + ymLabel(SEL) + " eingetragen" : "✅ Gespeichert"); render();
+  };
+  if (id) confirmBtn($("#fDel"), "Wirklich löschen? Nochmal tippen", async () => { const idx = inc.list.findIndex(i => i.id === id); await materializeIncomes(); D.incomes[SEL].splice(idx, 1); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
+}
+
+/* Variable Ausgabe */
+function editTx(id){
+  const x = id ? D.tx.find(t => t.id === id) : {date: SEL === CUR() ? todayISO() : SEL + "-01", cat:"essen"};
+  openSheet(`<h2>${id ? "Ausgabe bearbeiten" : "Neue Ausgabe"}</h2>
+    <div class="field"><input class="inp amount num" id="fAmt" inputmode="decimal" placeholder="0,00 €" value="${amtStr(x.amount)}"></div>
+    <div class="field"><label>Wofür / Wo</label><input class="inp" id="fName" value="${esc(x.name)}" placeholder="z. B. REWE" maxlength="60"></div>
+    <div class="field"><label>Kategorie</label><div class="chips" id="fCat">${catChips(x.cat)}</div></div>
+    <div class="field"><label>Datum</label><input class="inp" type="date" id="fDate" value="${x.date}"></div>
+    <button class="btn" id="fSave">Speichern</button>${id ? '<button class="btn del" id="fDel">Löschen</button>' : ""}`);
+  chipPick("#fCat");
+  let touchedCat = !!id;
+  $("#fCat").addEventListener("click", () => touchedCat = true);
+  $("#fName").addEventListener("input", () => { if (touchedCat) return; const g = guessCategory($("#fName").value, D.rules); if (g !== "sonst") $("#fCat").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.id === g)); });
+  if (!id) setTimeout(() => $("#fAmt").focus(), 350);
+  $("#fSave").onclick = async e => {
+    const amount = parseAmt($("#fAmt").value), name = $("#fName").value.trim(), date = $("#fDate").value || todayISO();
+    if (!amount) return shakeEl($("#fAmt")); if (!name) return shakeEl($("#fName"));
+    const obj = {...x, id: x.id || uid(), amount: Math.abs(amount), name, date, cat: $("#fCat .chip.on")?.dataset.id || "sonst", src: x.src || "manual"};
+    learn(name, obj.cat);
+    if (id) D.tx = D.tx.map(t => t.id === id ? obj : t); else D.tx.push(obj);
+    await persist(); closeSheet(); burst(e); toast("🧾 Gespeichert"); SEL = date.slice(0,7); render();
+  };
+  if (id) confirmBtn($("#fDel"), "Wirklich löschen? Nochmal tippen", async () => { D.tx = D.tx.filter(t => t.id !== id); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
+}
+function learn(name, catId){ const k = merchantKey(name); if (k) D.rules[k] = catId; }
+
+/* Fixkosten (versioniert) */
+function editFixed(id){
+  const x = id ? D.fixed.find(i => i.id === id) : {interval:"monthly", cat: D.categories[0]?.id, month: new Date().getMonth()+1};
+  const startDefault = id ? (x.from > SEL ? x.from : SEL) : SEL;
+  openSheet(`<h2>${id ? "Fixkosten bearbeiten" : "Neue Fixkosten"}</h2>
+    <div class="field"><input class="inp amount num" id="fAmt" inputmode="decimal" placeholder="0,00 €" value="${amtStr(x.amount)}"></div>
+    <div class="field"><label>Bezeichnung</label><input class="inp" id="fName" placeholder="z. B. Miete, Spotify, ETF-Sparplan" value="${esc(x.name)}" maxlength="60"></div>
+    <div class="field"><label>Kategorie</label><div class="chips" id="fCat">${catChips(x.cat)}</div></div>
+    <div class="field"><label>Turnus</label><div class="chips" id="fInt">${Object.entries(INTERVALS).map(([k,v]) => `<button class="chip ${k===x.interval?"on":""}" data-id="${k}">${v.label}</button>`).join("")}</div></div>
+    <div class="two">
+      <div class="field"><label>Abbuchung am (Tag)</label><input class="inp num" id="fDay" inputmode="numeric" placeholder="optional" value="${x.day || ""}"></div>
+      <div class="field" id="fMonthWrap"><label>Fällig im</label><select class="inp" id="fMonth">${MONTHS.map((m,i) => `<option value="${i+1}" ${i+1==x.month?"selected":""}>${m}</option>`).join("")}</select></div>
+    </div>
+    <div class="field"><label>${id ? "Änderung gilt ab" : "Gilt ab"}</label><select class="inp" id="fFrom">${monthOptions(startDefault)}</select></div>
+    <div class="field"><label>Notiz</label><input class="inp" id="fNote" placeholder="optional" value="${esc(x.note)}" maxlength="80"></div>
+    <button class="btn" id="fSave">Speichern</button>
+    ${id ? `<button class="btn sec" id="fEnd">Ab ${ymLabel(SEL)} beenden</button><button class="btn del" id="fDel">Komplett löschen (auch Historie)</button>` : ""}`);
+  const upd = () => $("#fMonthWrap").style.visibility = $("#fInt .chip.on")?.dataset.id === "monthly" ? "hidden" : "visible";
+  chipPick("#fCat"); chipPick("#fInt", upd); upd();
+  if (!id) setTimeout(() => $("#fAmt").focus(), 350);
+  $("#fSave").onclick = async e => {
+    const amount = parseAmt($("#fAmt").value), name = $("#fName").value.trim();
+    if (!amount) return shakeEl($("#fAmt")); if (!name) return shakeEl($("#fName"));
+    const from = $("#fFrom").value;
+    const obj = {name, amount, interval: $("#fInt .chip.on")?.dataset.id || "monthly", cat: $("#fCat .chip.on")?.dataset.id || "sonst", day: Math.min(31, parseInt($("#fDay").value) || 0) || null, month: parseInt($("#fMonth").value) || 1, note: $("#fNote").value.trim()};
+    if (!id) D.fixed.push({...obj, id: uid(), from, until: null});
+    else {
+      const money = obj.amount !== x.amount || obj.interval !== x.interval || obj.cat !== x.cat;
+      if (money && from > x.from){ x.until = addM(from, -1); D.fixed.push({...x, ...obj, id: uid(), from, until: null, prev: x.id}); D.fixed = D.fixed.map(f => f.id === x.id ? {...x, until: addM(from, -1)} : f); }
+      else D.fixed = D.fixed.map(f => f.id === id ? {...f, ...obj, from: from < f.from ? from : f.from} : f);
+    }
+    await persist(); closeSheet(); burst(e); toast(id ? "✅ Gespeichert" : "✨ Hinzugefügt"); render();
+  };
+  if (id){
+    confirmBtn($("#fEnd"), `Ab ${ymLabel(SEL)} beenden? Nochmal tippen`, async () => { if (x.from >= SEL) D.fixed = D.fixed.filter(f => f.id !== id); else D.fixed = D.fixed.map(f => f.id === id ? {...f, until: addM(SEL, -1)} : f); await persist(); closeSheet(); toast("⏹️ Beendet – Historie bleibt"); render(); });
+    confirmBtn($("#fDel"), "Auch aus der Historie löschen? Nochmal tippen", async () => { D.fixed = D.fixed.filter(f => f.id !== id); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
+  }
+}
+
+/* Kredite */
+function editLoan(id){
+  const x = id ? D.loans.find(l => l.id === id) : {asOf: CUR(), from: CUR()};
+  const curBal = id ? (loanCalc(x, CUR()).bal ?? x.balance) : null;
+  openSheet(`<h2>${id ? "Kredit bearbeiten" : "Neuer Kredit"}</h2>
+    <div class="field"><label>Bezeichnung</label><input class="inp" id="lName" value="${esc(x.name)}" placeholder="z. B. Autokredit, Ratenkauf TV" maxlength="50"></div>
+    <div class="field"><label>Bank / Händler</label><input class="inp" id="lLender" value="${esc(x.lender)}" placeholder="optional" maxlength="40"></div>
+    <div class="two">
+      <div class="field"><label>Monatsrate</label><input class="inp num" id="lRate" inputmode="decimal" value="${amtStr(x.rate)}" placeholder="0,00"></div>
+      <div class="field"><label>Zinssatz % p.a.</label><input class="inp num" id="lInt" inputmode="decimal" value="${amtStr(x.interest)}" placeholder="z. B. 4,9 (opt.)"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Restschuld aktuell</label><input class="inp num" id="lBal" inputmode="decimal" value="${curBal != null ? amtStr(Math.round(curBal*100)/100) : ""}" placeholder="0,00"></div>
+      <div class="field"><label>Ursprünglich</label><input class="inp num" id="lOrig" inputmode="decimal" value="${amtStr(x.original)}" placeholder="optional"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Läuft seit</label><select class="inp" id="lFrom">${monthOptions(x.from || CUR(), 120, 6)}</select></div>
+      <div class="field"><label>Abbuchung am</label><input class="inp num" id="lDay" inputmode="numeric" value="${x.day || ""}" placeholder="Tag (opt.)"></div>
+    </div>
+    <div class="preview" id="lPrev">Trag Rate und Restschuld ein – ich rechne aus, wann du schuldenfrei bist.</div>
+    <button class="btn" id="lSave">Speichern</button>${id ? '<button class="btn del" id="lDel">Kredit löschen</button>' : ""}`);
+  const read = () => ({...x, name:$("#lName").value.trim(), lender:$("#lLender").value.trim(), rate:parseAmt($("#lRate").value), interest:parseAmt($("#lInt").value) || 0, balance:parseAmt($("#lBal").value), original:parseAmt($("#lOrig").value) || null, from:$("#lFrom").value, asOf:CUR(), day: Math.min(31, parseInt($("#lDay").value) || 0) || null});
+  const prev = () => { const l = read(); if (!l.rate || !l.balance){ return; } const p = loanPlan(l);
+    $("#lPrev").innerHTML = p.endless ? "⚠️ Die Rate deckt nicht einmal die Zinsen – bitte prüfen." : `Noch <b>${p.months} Raten</b> · schuldenfrei im <b>${ymLabel(p.end)}</b>${l.interest ? `<br>Zinsen bis dahin ca. <b>${fmt(p.interest, true)}</b>` : "<br><small>Ohne Zinssatz rechne ich zinsfrei (z. B. 0 %-Finanzierung).</small>"}`; };
+  ["#lRate","#lInt","#lBal"].forEach(s => $(s).addEventListener("input", prev)); prev();
+  $("#lSave").onclick = async e => {
+    const l = read(); if (!l.name) return shakeEl($("#lName")); if (!l.rate) return shakeEl($("#lRate")); if (!l.balance) return shakeEl($("#lBal"));
+    if (l.from > l.asOf) l.from = l.asOf;
+    if (id) D.loans = D.loans.map(o => o.id === id ? l : o); else D.loans.push({...l, id: uid()});
+    await persist(); closeSheet(); burst(e); toast("🏦 Kredit gespeichert"); fixTab = "loan"; if (current !== "home") go("fix"); else render();
+  };
+  if (id) confirmBtn($("#lDel"), "Wirklich löschen? Nochmal tippen", async () => { D.loans = D.loans.filter(l => l.id !== id); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
+}
+
+/* Sparziele */
+const GOAL_EMOJI = ["🎯","✈️","🏖️","🚗","📱","🎮","🏠","💍","🎁","🛟","📚","🚲"];
+function editGoal(id){
+  const x = id ? D.goals.find(g => g.id === id) : {emoji:"🎯", saved:0};
+  openSheet(`<h2>${id ? "Sparziel bearbeiten" : "Neues Sparziel"}</h2>
+    <div class="field"><label>Symbol</label><div class="chips" id="gEmo">${GOAL_EMOJI.map(e => `<button class="chip ${e===x.emoji?"on":""}" data-id="${e}" style="font-size:20px;padding:6px 10px">${e}</button>`).join("")}</div></div>
+    <div class="field"><label>Wofür?</label><input class="inp" id="gName" value="${esc(x.name)}" placeholder="z. B. Urlaub, Notgroschen" maxlength="40"></div>
+    <div class="two">
+      <div class="field"><label>Zielbetrag</label><input class="inp num" id="gTarget" inputmode="decimal" value="${amtStr(x.target)}" placeholder="0,00"></div>
+      <div class="field"><label>Schon gespart</label><input class="inp num" id="gSaved" inputmode="decimal" value="${amtStr(x.saved)}" placeholder="0,00"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Erreichen bis</label><select class="inp" id="gDue">${monthOptions(x.due || "", 0, 120, true)}</select></div>
+      <div class="field"><label>Geplant / Monat</label><input class="inp num" id="gMon" inputmode="decimal" value="${amtStr(x.monthly)}" placeholder="optional"></div>
+    </div>
+    <div class="preview" id="gPrev">Zielbetrag eingeben – Zieldatum und Monatsrate sind optional.</div>
+    <button class="btn" id="gSave">Speichern</button>${id ? '<button class="btn del" id="gDel">Ziel löschen</button>' : ""}`);
+  chipPick("#gEmo");
+  const read = () => ({...x, emoji: $("#gEmo .chip.on")?.dataset.id || "🎯", name:$("#gName").value.trim(), target:parseAmt($("#gTarget").value), saved:parseAmt($("#gSaved").value), due:$("#gDue").value || null, monthly:parseAmt($("#gMon").value) || null});
+  const prev = () => { const g = read(); if (!g.target) return; const gi = goalInfo(g);
+    $("#gPrev").innerHTML = gi.done ? "🎉 Schon erreicht!" : [`Noch <b>${fmt(gi.rest, true)}</b> bis zum Ziel`, g.due ? `Dafür <b>${fmt(gi.need, true)}/Monat</b> bis ${ymLabel(g.due)}` : null, g.monthly ? `Mit ${fmt(g.monthly, true)}/Monat erreicht im <b>${ymLabel(gi.eta)}</b>` : null].filter(Boolean).join("<br>"); };
+  ["#gTarget","#gSaved","#gMon","#gDue"].forEach(s => $(s).addEventListener("input", prev)); prev();
+  $("#gSave").onclick = async e => {
+    const g = read(); if (!g.name) return shakeEl($("#gName")); if (!g.target) return shakeEl($("#gTarget"));
+    if (id) D.goals = D.goals.map(o => o.id === id ? g : o); else D.goals.push({...g, id: uid(), created: todayISO()});
+    await persist(); closeSheet(); burst(e); toast("🎯 Sparziel gespeichert"); render();
+  };
+  if (id) confirmBtn($("#gDel"), "Wirklich löschen? Nochmal tippen", async () => { D.goals = D.goals.filter(g => g.id !== id); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
+}
+function depositGoal(id){
+  const g = D.goals.find(x => x.id === id);
+  openSheet(`<h2>${esc(g.emoji)} ${esc(g.name)}</h2><p class="hint">Wie viel hast du dazugelegt? Für eine Entnahme ein Minus voranstellen.</p>
+    <div class="field"><input class="inp amount num" id="dAmt" inputmode="decimal" placeholder="0,00 €" value="${g.monthly ? amtStr(g.monthly) : ""}"></div><button class="btn" id="dOk">Einzahlen</button>`);
+  setTimeout(() => $("#dAmt").focus(), 350);
+  $("#dOk").onclick = async e => {
+    const a = parseAmt($("#dAmt").value); if (!a) return shakeEl($("#dAmt"));
+    const before = goalInfo(g).done; g.saved = Math.max(0, Math.round(((g.saved || 0) + a) * 100) / 100);
+    (g.log = g.log || []).push({d: todayISO(), a});
+    await persist(); closeSheet(); burst(e); if (!before && goalInfo(g).done){ burst(e); setTimeout(() => burst(e), 250); toast("🎉 Ziel erreicht!"); } else toast("🐷 " + fmt(a) + " gespart"); render();
+  };
+}
+
+/* ---------- Screenshot-Import (OCR läuft lokal auf dem Gerät) ---------- */
+/* BANK-PARSER-START */
+const MONTH_NAMES = {jan:1,januar:1,feb:2,februar:2,"mär":3,maer:3,mar:3,"märz":3,maerz:3,apr:4,april:4,mai:5,jun:6,juni:6,jul:7,juli:7,aug:8,august:8,sep:9,sept:9,september:9,okt:10,oktober:10,nov:11,november:11,dez:12,dezember:12};
+const NOISE = /^(kartenzahlung|lastschrift|sepa[- ]?lastschrift|überweisung|ueberweisung|dauerauftrag|gutschrift|zahlung|debitkarte|kreditkarte|visa|mastercard|girocard|apple pay|google pay|vorgemerkt|gebucht|umsätze|umsaetze|ausgaben|einnahmen|alle|suche|filter|heute|gestern|kontostand.*|saldo.*|verfügbar.*|verfuegbar.*|[a-z]{0,2})$/i;
+const SKIP_LINE = /kontostand|saldo|verfügbar|verfuegbar|dispo|kreditrahmen|iban|bic\b/i;
+const AMOUNT_RE = /([+\-−–]?)\s?(\d{1,3}(?:[.\s']\d{3})*|\d+),(\d{2})(?!\d)\s?(€|eur)?/i;
+
+function parseDateIn(line, refYear, today){
+  const l = line.toLowerCase().trim();
+  let m;
+  if (/^heute\b/.test(l)) return today.toISOString().slice(0,10);
+  if (/^gestern\b/.test(l)){ const d = new Date(today); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
+  if ((m = l.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/))){
+    let y = m[3] ? +m[3] : refYear; if (y < 100) y += 2000;
+    const mo = +m[2], d = +m[1]; if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) return `${y}-${pad2(mo)}-${pad2(d)}`;
+  }
+  if ((m = l.match(/(\d{1,2})\.?\s+([a-zäöü]{3,9})\.?\s*(\d{4})?/))){
+    const mo = MONTH_NAMES[m[2]] || MONTH_NAMES[m[2].slice(0,3)];
+    if (mo){ const y = m[3] ? +m[3] : refYear; return `${y}-${pad2(mo)}-${pad2(+m[1])}`; }
+  }
+  return null;
+}
+function cleanName(s){
+  return s.replace(AMOUNT_RE, "").replace(/\b\d{1,2}\.\d{1,2}\.(\d{2,4})?\b/g, "")
+    .replace(/[|•·>›»<«_=~*#]+/g, " ").replace(/\s{2,}/g, " ").replace(/^[\s\-–,.:;]+|[\s\-–,.:;]+$/g, "").trim();
+}
+function letters(s){ return (s.match(/[a-zäöüß]/gi) || []).length; }
+
+/** Liest erkannten Text eines Banking-Screenshots und liefert Buchungen. */
+function parseBankText(text, today = new Date()){
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const out = [];
+  let curDate = null, lastText = null, lastTextIdx = -9;
+  const refYear = today.getFullYear();
+  lines.forEach((line, idx) => {
+    if (SKIP_LINE.test(line)) return;
+    const am = line.match(AMOUNT_RE);
+    const dt = parseDateIn(line, refYear, today);
+    if (!am){
+      if (dt && letters(cleanName(line).replace(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|mo|di|mi|do|fr|sa|so|heute|gestern|januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)\b/gi, "")) < 3){ curDate = dt; return; }
+      if (dt) curDate = dt;
+      const n = cleanName(line);
+      if (letters(n) >= 3 && !NOISE.test(n)) { lastText = n; lastTextIdx = idx; }
+      return;
+    }
+    const sign = am[1];
+    const value = parseFloat(am[2].replace(/[.\s']/g, "") + "." + am[3]);
+    if (!value) return;
+    let name = cleanName(line);
+    if (letters(name) < 3 || NOISE.test(name)) name = (lastText && idx - lastTextIdx <= 3) ? lastText : "";
+    if (!name) return;
+    const positive = sign === "+";
+    const date = dt || curDate || today.toISOString().slice(0,10);
+    out.push({date, name: name.slice(0, 60), amount: value, income: positive});
+    lastText = null;
+  });
+  return out;
+}
+
+const CAT_HINTS = [
+  ["essen", /rewe|edeka|aldi|lidl|penny|netto|kaufland|norma|globus|tegut|marktkauf|nahkauf|bäcker|baecker|backhaus|metzger|getränke|getraenke|hellofresh|flink|picnic/i],
+  ["gesund", /\bdm\b|dm-drogerie|dm drogerie|rossmann|müller|apotheke|arzt|zahnarzt|optiker|fielmann/i],
+  ["mobil", /aral|shell|esso|\bjet\b|totalenergies|\btotal\b|tankstelle|agip|\bavia\b|star tank|ionity|enbw|ladestation|tesla supercharger|\bdb\b|deutsche bahn|bahn\.de|bvg|mvg|hvv|rmv|flixbus|parken|parkhaus|easypark|uber|bolt|waschstraße|waschanlage|atu|werkstatt/i],
+  ["abo", /netflix|spotify|disney|apple\.com|itunes|icloud|youtube|dazn|sky\b|waipu|prime video|amazon prime|playstation plus|ps plus|xbox game|nintendo online|audible|chatgpt|openai|claude|anthropic/i],
+  ["frei", /restaurant|pizzeria|mcdonald|burger king|kfc|subway|starbucks|cafe|café|bar\b|kino|cinemaxx|steam|playstation store|nintendo|lieferando|wolt|uber eats|eventim|ticket/i],
+  ["shop", /amazon|amzn|zalando|otto\b|ebay|mediamarkt|media markt|saturn|ikea|h&m|primark|decathlon|about you|shein|temu|paypal|galaxus|cyberport|alternate/i],
+  ["wohnen", /miete|stadtwerke|vodafone|telekom|\bo2\b|1&1|rundfunk|ard zdf|strom|gaswerk|wasser|obi\b|bauhaus|hornbach|toom/i],
+  ["vers", /versicherung|allianz|huk|ergo|axa|devk|r\+v|generali|hdi|signal iduna|barmenia/i],
+  ["sparen", /trade republic|scalable|comdirect depot|sparplan|tagesgeld|etf/i],
+];
+function merchantKey(name){ return name.toLowerCase().replace(/[^a-zäöüß0-9 ]/g, " ").split(/\s+/).filter(w => w.length > 1).slice(0, 2).join(" "); }
+function guessCategory(name, rules = {}){
+  const k = merchantKey(name);
+  if (rules[k]) return rules[k];
+  const first = k.split(" ")[0];
+  const hit = Object.keys(rules).find(r => r.split(" ")[0] === first && first.length >= 4);
+  if (hit) return rules[hit];
+  for (const [cat, re] of CAT_HINTS) if (re.test(name)) return cat;
+  return "sonst";
+}
+
+let ocrBusy = false;
+function loadTesseract(){
+  if (window.Tesseract) return Promise.resolve();
+  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = TESSERACT_URL; s.onload = res; s.onerror = () => rej(new Error("Texterkennung konnte nicht geladen werden (Internet?)")); document.head.appendChild(s); });
+}
+/* Bild für OCR aufbereiten: Graustufen, Dark-Mode invertieren, Kontrast */
+function prepImage(file){
+  return new Promise((res, rej) => {
+    const img = new Image(); img.onload = () => {
+      const scale = img.width < 900 ? 2 : img.width > 2200 ? 2200 / img.width : 1;
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      const x = c.getContext("2d"); x.drawImage(img, 0, 0, c.width, c.height);
+      const d = x.getImageData(0, 0, c.width, c.height), p = d.data; let sum = 0;
+      for (let i = 0; i < p.length; i += 4){ const g = 0.299*p[i] + 0.587*p[i+1] + 0.114*p[i+2]; p[i] = p[i+1] = p[i+2] = g; sum += g; }
+      const invert = sum / (p.length / 4) < 120;
+      for (let i = 0; i < p.length; i += 4){ let g = invert ? 255 - p[i] : p[i]; g = Math.max(0, Math.min(255, (g - 128) * 1.5 + 128)); p[i] = p[i+1] = p[i+2] = g; }
+      x.putImageData(d, 0, 0); URL.revokeObjectURL(img.src); res(c);
+    };
+    img.onerror = rej; img.src = URL.createObjectURL(file);
+  });
+}
+function startOCR(){ $("#imgIn").value = ""; $("#imgIn").click(); }
+$("#imgIn").onchange = async e => {
+  const files = [...e.target.files]; if (!files.length) return;
+  ocrBusy = true;
+  openSheet(`<h2>📷 Lese Screenshots …</h2><div class="ocr-thumbs">${files.map(f => `<img src="${URL.createObjectURL(f)}">`).join("")}</div>
+    <p class="hint" id="ocrMsg">Lade Texterkennung … (beim ersten Mal ca. 10 MB, danach gespeichert)</p><div class="prog"><div id="ocrBar"></div></div>
+    <p class="hint">🔒 Die Bilder werden nur auf diesem Gerät ausgewertet und nirgendwo hochgeladen.</p>`);
+  const msg = t => { if ($("#ocrMsg")) $("#ocrMsg").textContent = t; }, bar = p => { if ($("#ocrBar")) $("#ocrBar").style.width = Math.round(p * 100) + "%"; };
+  let worker;
+  try{
+    await loadTesseract();
+    let fileIdx = 0;
+    worker = await Tesseract.createWorker("deu", 1, {logger: m => { if (m.status === "recognizing text") { msg(`Erkenne Text … Bild ${fileIdx + 1} von ${files.length}`); bar((fileIdx + m.progress) / files.length); } else if (/load|init/.test(m.status)) msg("Bereite Texterkennung vor …"); }});
+    let found = [];
+    for (; fileIdx < files.length; fileIdx++){
+      const canvas = await prepImage(files[fileIdx]);
+      const {data} = await worker.recognize(canvas);
+      found = found.concat(parseBankText(data.text, new Date()));
+    }
+    await worker.terminate(); ocrBusy = false;
+    reviewOCR(found);
+  }catch(err){
+    ocrBusy = false; try { worker && worker.terminate(); } catch {}
+    openSheet(`<h2>Hat nicht geklappt 😕</h2><p class="hint">${esc(err.message || err)}</p><button class="btn" onclick="startOCR()">Nochmal versuchen</button><button class="btn sec" onclick="editTx()">Manuell erfassen</button>`);
+  }
+};
+function reviewOCR(found){
+  const seen = new Set();
+  const rows = found.filter(r => { const k = r.date + r.amount + r.name; if (seen.has(k)) return false; seen.add(k); return true; })
+    .map(r => ({...r, id: uid(), cat: r.income ? "sonst" : guessCategory(r.name, D.rules), dup: D.tx.some(t => t.date === r.date && Math.abs(t.amount - r.amount) < 0.005)}));
+  if (!rows.length){
+    openSheet(`<h2>Keine Umsätze gefunden</h2><p class="hint">Ich konnte keine Beträge erkennen. Tipp: Die Umsatzliste so screenshotten, dass Händler und Betrag gut lesbar sind (nicht zu stark verkleinert).</p><button class="btn" onclick="startOCR()">Anderen Screenshot wählen</button><button class="btn sec" onclick="editTx()">Manuell erfassen</button>`);
+    return;
+  }
+  const opts = sel => D.categories.map(c => `<option value="${c.id}" ${c.id===sel?"selected":""}>${c.emoji} ${esc(c.name)}</option>`).join("");
+  openSheet(`<h2>${rows.length} Umsätze erkannt</h2><p class="hint">Bitte kurz prüfen. Was du korrigierst, merke ich mir für das nächste Mal. Gutschriften (+) und mögliche Doppelte sind abgewählt.</p>
+    <div id="ocrList">${rows.map(r => `<div class="ocr-row ${r.dup?"dup":""} ${r.income?"inc":""}" data-id="${r.id}">
+      <input type="checkbox" ${r.dup || r.income ? "" : "checked"}>
+      <input class="on" value="${esc(r.name)}">
+      <span class="oa num">${r.income ? "+" : ""}<input class="on oamt num" value="${amtStr(r.amount.toFixed(2))}" inputmode="decimal" style="width:76px;text-align:right;font-weight:800"> €</span>
+      <div class="ob"><select>${opts(r.cat)}</select><input type="date" value="${r.date}"></div>
+      ${r.dup ? '<div class="ob"><span class="tag">evtl. schon erfasst</span></div>' : ""}${r.income ? '<div class="ob"><span class="tag o">Gutschrift – als Einnahme?</span></div>' : ""}</div>`).join("")}</div>
+    <button class="btn" id="ocrImport" style="margin-top:14px">Ausgewählte übernehmen</button><button class="btn sec" onclick="startOCR()">Weitere Screenshots</button>`);
+  const updBtn = () => { const n = $("#ocrList").querySelectorAll("input[type=checkbox]:checked").length; $("#ocrImport").textContent = n ? `${n} übernehmen` : "Nichts ausgewählt"; };
+  $("#ocrList").addEventListener("change", updBtn); updBtn();
+  $("#ocrImport").onclick = async e => {
+    let n = 0, ni = 0;
+    $("#ocrList").querySelectorAll(".ocr-row").forEach(el => {
+      if (!el.querySelector("input[type=checkbox]").checked) return;
+      const r = rows.find(x => x.id === el.dataset.id), name = el.querySelector("input.on").value.trim() || r.name;
+      const amount = parseAmt(el.querySelector(".oamt").value) || r.amount, catId = el.querySelector("select").value, date = el.querySelector("input[type=date]").value || r.date;
+      if (r.income){ const ym = date.slice(0,7); if (!Array.isArray(D.incomes[ym])) D.incomes[ym] = []; D.incomes[ym].push({id: uid(), name, amount, note:"aus Screenshot"}); ni++; return; }
+      D.tx.push({id: uid(), date, name, amount, cat: catId, src:"ocr"}); learn(name, catId); n++;
+    });
+    if (!n && !ni) return;
+    await persist(); closeSheet(); burst(e); toast(`📷 ${n} Ausgaben${ni ? ` · ${ni} Einnahmen` : ""} übernommen`); go("month");
+  };
+}
+
+/* ---------- Kleinere Dialoge ---------- */
+function editName(){
+  openSheet(`<h2>Dein Name</h2><div class="field"><input class="inp" id="nm" value="${esc(D.name)}" placeholder="Vorname" maxlength="30"></div><button class="btn" id="ok">Speichern</button>`);
+  $("#ok").onclick = async () => { D.name = $("#nm").value.trim(); await persist(); closeSheet(); go(current); };
+}
+function resetRules(){
+  const n = Object.keys(D.rules).length;
+  openSheet(`<h2>🧠 Gelernte Händler</h2><p class="hint">Wenn du eine Kategorie korrigierst, merkt sich die App den Händler. Aktuell ${n} Einträge.</p>
+    <div class="list">${Object.entries(D.rules).slice(0, 40).map(([k, c]) => `<div class="lg" style="padding:6px 0">${esc(k)}<span class="v">${cat(c).emoji} ${esc(cat(c).name)}</span></div>`).join("") || '<div class="empty">Noch nichts gelernt</div>'}</div>
+    ${n ? '<button class="btn del" id="rr">Alles vergessen</button>' : ""}`);
+  if (n) confirmBtn($("#rr"), "Wirklich alles vergessen? Nochmal tippen", async () => { D.rules = {}; await persist(); closeSheet(); render(); });
+}
+function editCats(){
+  const row = c => `<div class="two" style="grid-template-columns:62px 1fr 44px;margin-bottom:8px" data-id="${c.id}" data-saving="${c.saving?1:""}"><input class="inp ce" value="${c.emoji}" style="text-align:center;font-size:20px;padding:10px 4px" maxlength="4"><input class="inp cn" value="${esc(c.name)}" placeholder="Name" maxlength="30"><button class="iconbtn cd" ${["sonst","sparen"].includes(c.id)?"disabled style='opacity:.3'":""}>✕</button></div>`;
+  openSheet(`<h2>Kategorien</h2><p class="hint">Emoji oder Name antippen zum Ändern. Gelöschte Kategorien wandern zu „Sonstiges“. „Sparen“ zählt als Ausgabe und als Sparquote.</p>
+    <div id="catList">${D.categories.map(row).join("")}</div><button class="addrow" id="catAdd">＋ Kategorie</button><button class="btn" id="catSave" style="margin-top:14px">Speichern</button>`);
+  $("#catList").onclick = e => { const b = e.target.closest(".cd"); if (b && !b.disabled) b.parentElement.remove(); };
+  $("#catAdd").onclick = () => { $("#catList").insertAdjacentHTML("beforeend", row({id: uid(), emoji:"⭐", name:""})); $("#catList").lastElementChild.querySelector(".cn").focus(); };
+  $("#catSave").onclick = async () => {
+    const cats = [...$("#catList").children].map(r => ({id:r.dataset.id, emoji:r.querySelector(".ce").value.trim() || "•", name:r.querySelector(".cn").value.trim(), ...(r.dataset.saving ? {saving:true} : {})})).filter(c => c.name);
+    D.categories = cats; D = normalize(D);
+    const ids = new Set(D.categories.map(c => c.id));
+    D.fixed.forEach(x => { if (!ids.has(x.cat)) x.cat = "sonst"; }); D.tx.forEach(x => { if (!ids.has(x.cat)) x.cat = "sonst"; });
+    await persist(); closeSheet(); toast("🏷️ Kategorien gespeichert"); render();
+  };
+}
+function changePin(){
+  openSheet(`<h2>PIN ändern</h2>
+    <div class="field"><label>Aktuelle PIN</label><input class="inp num" id="p0" type="password" inputmode="numeric" maxlength="${PIN_LEN}"></div>
+    <div class="field"><label>Neue PIN (${PIN_LEN} Ziffern)</label><input class="inp num" id="p1" type="password" inputmode="numeric" maxlength="${PIN_LEN}"></div>
+    <div class="field"><label>Neue PIN wiederholen</label><input class="inp num" id="p2" type="password" inputmode="numeric" maxlength="${PIN_LEN}"></div>
+    <button class="btn" id="ok">PIN ändern</button>`);
+  $("#ok").onclick = async () => {
+    const p0 = $("#p0").value, p1 = $("#p1").value, p2 = $("#p2").value;
+    try { await openWith(await deriveKey(p0, SALT), JSON.parse(localStorage.getItem(VAULT))); } catch { return toast("❌ Aktuelle PIN falsch"); }
+    if (!new RegExp(`^\\d{${PIN_LEN}}$`).test(p1)) return toast(`❌ Neue PIN: ${PIN_LEN} Ziffern`);
+    if (p1 !== p2) return toast("❌ PINs stimmen nicht überein");
+    SALT = crypto.getRandomValues(new Uint8Array(16)); KEY = await deriveKey(p1, SALT); await persist(false); closeSheet(); toast("🔑 PIN geändert");
+  };
+}
+function askPassword(title, hint, confirm){
+  return new Promise(res => {
+    openSheet(`<h2>${title}</h2><p class="hint">${hint}</p><div class="field"><label>Passwort</label><input class="inp" id="pw1" type="password" autocomplete="new-password"></div>
+      ${confirm ? `<div class="field"><label>Wiederholen</label><input class="inp" id="pw2" type="password" autocomplete="new-password"></div>` : ""}
+      <button class="btn" id="ok">Weiter</button><button class="btn sec" id="cancel">Abbrechen</button>`);
+    setTimeout(() => $("#pw1").focus(), 300);
+    $("#ok").onclick = () => { const a = $("#pw1").value; if (a.length < 8) return toast("❌ Mind. 8 Zeichen"); if (confirm && a !== $("#pw2").value) return toast("❌ Stimmt nicht überein"); closeSheet(); res(a); };
+    $("#cancel").onclick = () => { closeSheet(); res(null); };
+  });
+}
+async function exportFile(){
+  const pw = await askPassword("Backup verschlüsseln", "Das Backup wird mit diesem Passwort verschlüsselt – ideal für iCloud Drive.", true); if (!pw) return;
+  const box = await sealPassword(pw, {...D, settings:{sync:null}});
+  const blob = new Blob([JSON.stringify(box)], {type:"application/json"}), name = `budget-backup-${todayISO()}.json`;
+  const file = new File([blob], name, {type:"application/json"});
+  if (navigator.canShare && navigator.canShare({files:[file]})) { try { await navigator.share({files:[file], title:name}); return; } catch(e){ if (e.name === "AbortError") return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); toast("📤 Backup erstellt");
+}
+function importFile(){ $("#fileIn").value = ""; $("#fileIn").click(); }
+$("#fileIn").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try{
+    let obj = JSON.parse(await f.text());
+    if (obj.format === "budget-enc"){ const pw = await askPassword("Backup entschlüsseln", "Passwort, mit dem das Backup erstellt wurde.", false); if (!pw) return; try { obj = await openPassword(pw, obj); } catch { return toast("❌ Falsches Passwort"); } }
+    if (!obj.fixed && !obj.expenses && !obj.incomes) throw new Error("format");
+    const keep = D.settings?.sync || null; D = normalize(obj); D.settings = {sync: keep};
+    await persist(); toast("📥 Import erfolgreich"); go("home");
+  }catch(err){ toast("❌ Datei nicht lesbar"); }
+};
+function wipe(){
+  openSheet(`<h2>Alles löschen?</h2><p class="hint">Löscht den verschlüsselten Tresor auf diesem Gerät. Ein GitHub-Sync-Stand bleibt erhalten. Tippe LÖSCHEN zur Bestätigung.</p><div class="field"><input class="inp" id="w" placeholder="LÖSCHEN"></div><button class="btn" style="background:var(--danger)" id="ok">Endgültig löschen</button>`);
+  $("#ok").onclick = () => { if ($("#w").value.trim().toUpperCase() !== "LÖSCHEN") return; localStorage.removeItem(VAULT); D = null; KEY = null; closeSheet(); showLock("setup1"); };
+}
+
+/* ---------- GitHub-Sync (Ende-zu-Ende verschlüsselt) ---------- */
+function editSync(){
+  const s = D.settings.sync || {owner:"", repo:"budget-daten", path:"budget.enc.json", token:"", pass:""};
+  openSheet(`<h2>☁️ GitHub-Sync</h2>
+    <p class="hint">Deine Daten werden <b>auf dem Gerät verschlüsselt</b> und erst dann in ein <b>privates</b> Repo geladen. GitHub sieht nur Zeichensalat.</p>
+    <div class="field"><label>GitHub-Benutzername</label><input class="inp" id="so" value="${esc(s.owner)}" autocapitalize="off" autocorrect="off"></div>
+    <div class="field"><label>Privates Daten-Repo</label><input class="inp" id="sr" value="${esc(s.repo)}" autocapitalize="off" autocorrect="off"></div>
+    <div class="field"><label>Token (fine-grained, nur dieses Repo)</label><input class="inp" id="st" type="password" value="${esc(s.token)}" placeholder="github_pat_…" autocapitalize="off"></div>
+    <div class="field"><label>Sync-Passwort (mind. 8 Zeichen)</label><input class="inp" id="sp" type="password" value="${esc(s.pass)}" autocomplete="new-password"></div>
+    <p class="hint">Das Sync-Passwort ist auf allen Geräten gleich. Token und Passwort liegen nur verschlüsselt auf diesem Gerät.</p>
+    <button class="btn" id="ok">Speichern & verbinden</button>${D.settings.sync ? '<button class="btn del" id="off">Sync ausschalten</button>' : ""}`);
+  $("#ok").onclick = async () => {
+    const n = {owner:$("#so").value.trim(), repo:$("#sr").value.trim(), path:s.path || "budget.enc.json", token:$("#st").value.trim(), pass:$("#sp").value};
+    if (!n.owner || !n.repo || !n.token) return toast("❌ Bitte alles ausfüllen"); if (n.pass.length < 8) return toast("❌ Sync-Passwort zu kurz");
+    D.settings.sync = n; await persist(false); closeSheet();
+    const remote = await ghGet().catch(e => ({err:e}));
+    if (remote?.err){ setSync(false, remote.err.message); render(); return; }
+    if (remote && remote.data) await pullSync(false); else await pushSync(); render();
+  };
+  if ($("#off")) $("#off").onclick = async () => { D.settings.sync = null; await persist(false); setSync(null, "aus"); closeSheet(); render(); };
+}
+function setSync(ok, msg){ syncState = {ok, msg}; if (current === "set" && D && !$("#sheet").classList.contains("on")) renderSet(); }
+async function gh(method, body){
+  const s = D.settings.sync;
+  const r = await fetch(`https://api.github.com/repos/${encodeURIComponent(s.owner)}/${encodeURIComponent(s.repo)}/contents/${s.path}`, {method, cache:"no-store",
+    headers:{"Authorization":"Bearer " + s.token, "Accept":"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28", ...(body ? {"Content-Type":"application/json"} : {})}, body: body ? JSON.stringify(body) : undefined});
+  if (r.status === 404 && method === "GET") return null;
+  if (r.status === 401) throw new Error("Token ungültig"); if (r.status === 403) throw new Error("Keine Berechtigung"); if (r.status === 404) throw new Error("Repo nicht gefunden");
+  if (!r.ok) throw new Error("GitHub-Fehler " + r.status);
+  return r.json();
+}
+async function ghGet(){
+  const j = await gh("GET"); if (!j) return null;
+  let content = j.content;
+  if (!content && j.git_url){ const b = await fetch(j.git_url, {headers:{"Authorization":"Bearer " + D.settings.sync.token}}).then(r => r.json()); content = b.content; }
+  return {sha:j.sha, data: JSON.parse(atob(content.replace(/\n/g,"")))};
+}
+function scheduleSync(){ if (!D?.settings?.sync) return; clearTimeout(syncTimer); setSync(null, "wartet …"); syncTimer = setTimeout(() => pushSync(true), 2500); }
+async function pushSync(silent){
+  if (!D?.settings?.sync) return;
+  try{
+    setSync(null, "lädt hoch …");
+    const cur = await ghGet(); const {settings, ...rest} = D;
+    const box = await sealPassword(D.settings.sync.pass, rest); box.updatedAt = D.updatedAt || Date.now();
+    await gh("PUT", {message:"Budget-Update " + new Date().toISOString(), content: btoa(JSON.stringify(box)), ...(cur ? {sha:cur.sha} : {})});
+    setSync(true, "synchron · " + new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})); if (!silent) toast("☁️ Hochgeladen");
+  }catch(e){ setSync(false, e.message); if (!silent) toast("❌ " + e.message); }
+}
+async function pullSync(auto){
+  if (!D?.settings?.sync) return;
+  try{
+    setSync(null, "prüft …");
+    const r = await ghGet();
+    if (!r){ if (!auto) await pushSync(); else setSync(true, "bereit"); return; }
+    if (auto && (r.data.updatedAt || 0) <= (D.updatedAt || 0)){ setSync(true, "aktuell"); if ((r.data.updatedAt||0) < (D.updatedAt||0)) pushSync(true); return; }
+    let obj; try { obj = await openPassword(D.settings.sync.pass, r.data); } catch { throw new Error("Sync-Passwort falsch"); }
+    const sync = D.settings.sync; D = normalize(obj); D.settings = {sync}; D.updatedAt = r.data.updatedAt || Date.now();
+    await persist(false); setSync(true, "aktualisiert"); toast("☁️ Neuester Stand geladen"); render();
+  }catch(e){ setSync(false, e.message); if (!auto) toast("❌ " + e.message); }
+}
+
+/* ---------- Effekte ---------- */
+let toastT;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2400); }
+function burst(e){
+  const r = (e?.target || document.body).getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2, cols = ["#FF7A1A","#FF9A3D","#FFD08A","#FFFFFF","#E5520A"];
+  for (let i = 0; i < 26; i++){
+    const p = document.createElement("div"); p.className = "burst"; p.style.background = cols[i % cols.length]; p.style.left = cx + "px"; p.style.top = cy + "px"; document.body.appendChild(p);
+    const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 120;
+    p.animate([{transform:"translate(0,0) rotate(0)", opacity:1}, {transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d - 60}px) rotate(${Math.random()*540}deg)`, opacity:0}], {duration:800 + Math.random()*400, easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish = () => p.remove();
+  }
+}
+
+/* ---------- Start ---------- */
+buildPad();
+showLock(localStorage.getItem(VAULT) ? "unlock" : "setup1");
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
