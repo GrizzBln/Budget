@@ -293,6 +293,48 @@ nav.tabs .fab:active{transform:scale(.92)}
 .bill::before,.bill::after{display:none}
 .key.bio{color:var(--orange2);display:grid;place-items:center}
 .key.bio.hidden{display:grid!important;visibility:hidden}
+
+/* ---------- v3 ---------- */
+.backlink{font:inherit;font-size:13px;font-weight:800;color:var(--orange2);letter-spacing:.5px;text-transform:none;padding:0}
+.card h3 small a{color:var(--orange2);text-decoration:none;font-weight:700}
+.card.opt{background:var(--bg2);border:1px dashed #4A3A2C}
+.flowbar{display:flex;height:16px;border-radius:8px;overflow:hidden;gap:2px;margin-bottom:14px;background:#2A211A}
+.flow{display:flex;flex-direction:column;gap:9px}
+.flow .lg{font-size:15px}
+.flow .lg.total{border-top:1px solid var(--line);padding-top:10px;font-size:16px}
+.flow .lg.total .v{font-size:17px}
+.fcbox{display:flex;gap:10px;align-items:center;background:var(--card);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.45;color:#D8CBBE}
+.fcbox b{color:var(--text)}
+.hero.green{background:linear-gradient(140deg,#2FC08F 0%,#1E9A70 60%,#14704F 100%);box-shadow:0 24px 60px -20px rgba(43,181,133,.5)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.rtile{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:3px}
+.rtile span{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+.rtile b{font-size:19px;font-weight:800}
+.rtile small{font-size:12px}
+.ins{display:flex;flex-direction:column;gap:12px}
+.ins>div{display:flex;gap:12px;align-items:flex-start}
+.ins>div>span{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center}
+.ins p{margin:5px 0 0;font-size:14px;line-height:1.4}
+.ychart{position:relative;display:flex;align-items:flex-end;gap:4px;border-bottom:1px solid var(--line)}
+.ycol{flex:1;height:100%;position:relative;padding:0;border-radius:6px 6px 0 0;display:flex;align-items:flex-end}
+.ycol.sel{background:rgba(255,122,26,.10)}
+.ybar{display:block;width:100%;background:var(--free);border-radius:4px 4px 0 0}
+.yfix{position:absolute;left:-1px;right:-1px;height:2.5px;background:var(--fix);border-radius:2px}
+.ylbl{display:flex;gap:4px;margin-top:6px}
+.ylbl span{flex:1;text-align:center;font-size:10px;color:var(--faint)}
+.ylbl span.now{color:var(--orange2);font-weight:800}
+.ytab{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:4px 6px;font-size:13px;align-items:baseline}
+.ytab>span{font-size:11px;color:var(--faint);font-weight:800;text-transform:uppercase;letter-spacing:.6px;text-align:right}
+.ytab>span:first-child{text-align:left}
+.ytrow{display:contents;font:inherit;color:inherit}
+.ytrow>*{padding:8px 0;border-top:1px solid var(--line);text-align:right}
+.ytrow>span:first-child{text-align:left}
+.grp{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:800;margin:14px 0 8px}
+.optrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);margin-bottom:8px;font-size:15px;color:var(--faint)}
+.optrow>span{font-size:22px}
+.optrow div{flex:1;color:var(--text)}
+.optrow small{display:block;font-size:12px;color:var(--muted)}
+.pill span{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -320,9 +362,9 @@ nav.tabs .fab:active{transform:scale(.92)}
 
 <nav class="tabs hidden" id="tabs">
   <button data-v="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Übersicht</button>
-  <button data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Monat</button>
-  <button class="fab" id="fab" aria-label="Neu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <button data-v="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Fixkosten</button>
+  <button class="fab" id="fab" aria-label="Neu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button data-v="year"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Jahr</button>
   <button data-v="goals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Ziele</button>
 </nav>
 
@@ -341,8 +383,18 @@ nav.tabs .fab:active{transform:scale(.92)}
    Alle Daten: AES-256-GCM verschlüsselt im Browser.
    Im Code (und damit auf GitHub) stehen KEINE persönlichen Zahlen.
    ========================================================= */
-const APP_VERSION = "2.6.1";
+const APP_VERSION = "3.0.0";
 const CHANGELOG = [
+  {v:"3.0.0", d:"27.11.2026", items:[
+    "🧭 Neue Ausrichtung als Fixkosten-Analyse: Hauptzahl „Frei nach Fixkosten“ mit Geldfluss und Fixquote",
+    "📊 Neuer Tab „Jahr“: Gehalt gesamt, Ø, höchster/niedrigster Monat, Diagramm, Jahresbilanz und Monatstabelle",
+    "📅 Monatsrückblick: öffnet sich beim ersten Start im neuen Monat, später über Übersicht oder Jahr erneut abrufbar",
+    "🎁 Sonstige Eingänge (eBay-Verkauf, Geschenke …) getrennt vom Gehalt",
+    "🧾 Alltagsausgaben optional mit Prognose, was am Monatsende übrig bleibt",
+    "➕ Erfassen-Menü neu sortiert: Gehalt und Fixkosten zuerst"]},
+  {v:"2.6.2", d:"27.11.2026", items:[
+    "🐞 Gehalt stapelte sich über die Monate (Schätzung wurde beim Hinzufügen mitkopiert) – behoben, betroffene Monate werden automatisch bereinigt",
+    "🐞 Fixkosten: Startmonat wird beim Bearbeiten korrekt angezeigt; neues Feld „Endet nach“; „Neuer Betrag gilt ab“ erscheint nur, wenn du den Betrag änderst"]},
   {v:"2.6.1", d:"27.11.2026", items:[
     "🐞 Kredite mit Start in der Zukunft: Startmonat wird nicht mehr auf den aktuellen Monat zurückgesetzt, Raten zählen erst ab der ersten Rate, Laufzeit und Enddatum stimmen"]},
   {v:"2.6.0", d:"27.11.2026", items:[
@@ -436,6 +488,7 @@ function normalize(o){
   }
   for (const k of ["fixed","loans","tx","goals"]) if (!Array.isArray(d[k])) d[k] = [];
   if (!d.incomes || Array.isArray(d.incomes)) d.incomes = {};
+  for (const list of Object.values(d.incomes)) (list || []).forEach(x => { if (!x.kind) x.kind = /gehalt|lohn|bezüge|entgelt|salary/i.test(x.name || "") ? "gehalt" : "sonstig"; });
   if (!d.rules) d.rules = {};
   if (!d.deleted || typeof d.deleted !== "object") d.deleted = {};
   if (!d.settings) d.settings = {sync:null};
@@ -535,10 +588,16 @@ function enterApp(first){
   $("#lock").classList.add("hidden"); $("#app").classList.remove("hidden"); $("#tabs").classList.remove("hidden");
   SEL = CUR(); go("home"); if (first) toast("🔐 Tresor angelegt");
   lastRemote = null;
+  if (!D.repairs?.incomeStack){
+    const n = repairIncomeStack(); D.repairs = {...(D.repairs || {}), incomeStack: true};
+    persist(n > 0).then(() => { if (n){ render(); setTimeout(() => toast(`🧹 ${n} doppelte Gehaltseinträge bereinigt`), 900); } });
+  }
   if (D.settings?.sync) pullSync(true);
   if (soundType() === "katsching") fileBuffer(SOUNDS.katsching.file).catch(() => {});
   let seen = null; try { seen = localStorage.getItem("budget.seenVersion"); localStorage.setItem("budget.seenVersion", APP_VERSION); } catch {}
+  const prevM = addM(CUR(), -1);
   if (seen && seen !== APP_VERSION) setTimeout(() => showChangelog(true), 600);
+  else if (D.settings.reviewSeen !== prevM && monthHasData(prevM)){ D.settings.reviewSeen = prevM; persist(false); setTimeout(() => openReview(prevM), 400); }
 }
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) hiddenAt = Date.now();
@@ -626,13 +685,16 @@ function bioSettings(){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {home:"Übersicht", month:"Monat", fix:"Fixkosten", goals:"Sparziele", set:"Einstellungen"};
+const TITLES = {home:"Übersicht", fix:"Fixkosten", year:"Jahr", goals:"Sparziele", set:"Einstellungen", inc:"Eingänge", alltag:"Alltag", review:"Rückblick"};
+const SUBVIEWS = {inc:"home", alltag:"home", review:"home"};
 function go(v){
   current = v;
-  document.querySelectorAll("nav.tabs button[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  const tab = SUBVIEWS[v] || v;
+  document.querySelectorAll("nav.tabs button[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === tab));
   $("#vtitle").textContent = TITLES[v];
   const h = new Date().getHours();
-  $("#hello").textContent = (h < 11 ? "Guten Morgen" : h < 18 ? "Hallo" : "Guten Abend") + (D.name ? ", " + D.name : "");
+  if (SUBVIEWS[v]) $("#hello").innerHTML = `<button class="backlink" onclick="go('home')">‹ Übersicht</button>`;
+  else $("#hello").textContent = (h < 11 ? "Guten Morgen" : h < 18 ? "Hallo" : "Guten Abend") + (D.name ? ", " + D.name : "");
   render(); window.scrollTo({top:0});
 }
 document.querySelectorAll("nav.tabs button[data-v]").forEach(b => b.onclick = () => go(b.dataset.v));
@@ -642,17 +704,24 @@ $("#fab").onclick = openAddMenu;
 function setMonth(ym){ SEL = ym; render(); }
 function monthBar(){
   const isCur = SEL === CUR();
-  return `<div class="monthbar"><button onclick="setMonth(addM(SEL,-1))" aria-label="Vormonat">‹</button><div class="ml" onclick="setMonth(CUR())">${ymLabel(SEL)}<small>${isCur ? "aktueller Monat" : ymDiff(CUR(), SEL) > 0 ? "Zukunft · Planung" : "Historie · tippen für heute"}</small></div><button onclick="setMonth(addM(SEL,1))" aria-label="Folgemonat">›</button></div>`;
+  return `<div class="monthbar"><button onclick="setMonth(addM(SEL,-1))" aria-label="Vormonat">‹</button><div class="ml" onclick="setMonth(CUR())">${ymLabel(SEL)}<small>${isCur ? "Tag " + new Date().getDate() + " von " + dim(SEL) : ymDiff(CUR(), SEL) > 0 ? "Zukunft · Planung" : "Historie · tippen für heute"}</small></div><button onclick="setMonth(addM(SEL,1))" aria-label="Folgemonat">›</button></div>`;
 }
 
 /* ---------- Berechnungen ---------- */
 const cat = id => D.categories.find(c => c.id === id) || {id:"sonst", name:"Sonstiges", emoji:"📦"};
 const isSaving = id => !!cat(id).saving;
 const activeFixed = ym => D.fixed.filter(f => (f.from || "0000-00") <= ym && (!f.until || f.until >= ym));
+const isSalary = x => (x.kind || "gehalt") === "gehalt";
+/* Eingänge eines Monats. Fehlt das Gehalt, wird das letzte bekannte Gehalt als Schätzung angezeigt (nie gespeichert). */
 function incomesFor(ym){
-  if (Array.isArray(D.incomes[ym])) return {list:D.incomes[ym], est:false};
-  const prev = Object.keys(D.incomes).filter(k => k < ym && D.incomes[k].length).sort().pop();
-  return prev ? {list:D.incomes[prev], est:true, from:prev} : {list:[], est:false};
+  const real = Array.isArray(D.incomes[ym]) ? D.incomes[ym] : [];
+  let est = [], from = null;
+  if (!real.some(isSalary)){
+    from = Object.keys(D.incomes).filter(k => k < ym && (D.incomes[k] || []).some(isSalary)).sort().pop() || null;
+    if (from) est = D.incomes[from].filter(isSalary).map(x => ({...x, est:true}));
+  }
+  const list = [...est, ...real], sum = a => a.reduce((t, x) => t + (x.amount || 0), 0);
+  return {list, real, est: est.length > 0, from, salary: sum(list.filter(isSalary)), other: sum(list.filter(x => !isSalary(x)))};
 }
 const txFor = ym => D.tx.filter(t => t.date.slice(0,7) === ym);
 
@@ -675,17 +744,17 @@ function loanPlan(l){
 }
 
 function summary(ym){
-  const inc = incomesFor(ym);
-  const fixed = activeFixed(ym);
-  let fix = 0, sav = 0; const perCat = new Map();
-  const addCat = (id, v) => { const c = cat(id); const e = perCat.get(c.id) || {c, sum:0, n:0}; e.sum += v; e.n++; perCat.set(c.id, e); };
-  fixed.forEach(f => { const v = monthlyOf(f); if (isSaving(f.cat)) sav += v; else fix += v; addCat(f.cat, v); });
-  const tx = txFor(ym); let vari = 0;
-  tx.forEach(t => { if (isSaving(t.cat)) sav += t.amount; else vari += t.amount; addCat(t.cat, t.amount); });
-  const loans = D.loans.reduce((s, l) => s + loanCalc(l, ym).pay, 0);
-  const income = inc.list.reduce((s, x) => s + (x.amount || 0), 0);
-  const out = fix + sav + vari + loans;
-  return {income, est:inc.est, estFrom:inc.from, fix, sav, vari, loans, out, free: income - out, perCat:[...perCat.values()].sort((a,b) => b.sum - a.sum), fixed, tx};
+  const inc = incomesFor(ym), fixed = activeFixed(ym);
+  let fix = 0, savFix = 0, vari = 0, savTx = 0;
+  const perFix = new Map(), perTx = new Map();
+  const add = (map, id, v) => { const c = cat(id); const e = map.get(c.id) || {c, sum:0, n:0}; e.sum += v; e.n++; map.set(c.id, e); };
+  fixed.forEach(f => { const v = monthlyOf(f); if (isSaving(f.cat)) savFix += v; else fix += v; add(perFix, f.cat, v); });
+  const tx = txFor(ym);
+  tx.forEach(t => { if (isSaving(t.cat)) savTx += t.amount; else vari += t.amount; add(perTx, t.cat, t.amount); });
+  const loans = D.loans.reduce((a, l) => a + loanCalc(l, ym).pay, 0);
+  const income = inc.salary + inc.other, fixTotal = fix + savFix + loans, freeFix = income - fixTotal;
+  return {income, salary: inc.salary, other: inc.other, est: inc.est, estFrom: inc.from, fix, savFix, savTx, sav: savFix + savTx, vari, loans, fixTotal, freeFix, free: freeFix - vari - savTx,
+    perCatFix: [...perFix.values()].sort((a,b) => b.sum - a.sum), perCatTx: [...perTx.values()].sort((a,b) => b.sum - a.sum), fixed, tx};
 }
 function nextDue(it, from = new Date()){
   const step = INTERVALS[it.interval]?.step ?? 1, start = (it.month || 1) - 1, day = it.day || 1;
@@ -707,91 +776,109 @@ function goalInfo(g){
   return {rest, pct, need, eta, done: rest <= 0};
 }
 
-/* ---------- Rendering ---------- */
-function render(){ ({home:renderHome, month:renderMonth, fix:renderFix, goals:renderGoals, set:renderSet})[current](); }
+/* ---------- Rendering (v3: Fixkosten-Analyse) ---------- */
+let YEAR = null, REVIEW = null;
+function render(){ ({home:renderHome, fix:renderFix, year:renderYear, goals:renderGoals, set:renderSet, inc:renderInc, alltag:renderAlltag, review:renderReview})[current](); }
 const hasAnyData = () => Object.keys(D.incomes).length || D.fixed.length || D.tx.length || D.loans.length;
+const monthHasData = m => (D.incomes[m] || []).length || txFor(m).length || activeFixed(m).length || D.loans.some(l => loanCalc(l, m).pay > 0);
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const dim = ym => { const [y, m] = ym.split("-").map(Number); return new Date(y, m, 0).getDate(); };
+const ICON = {
+  up:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>`,
+  down:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`,
+  house:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>`,
+  card:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>`,
+  goal:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>`,
+  plus:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`,
+  cal:`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h4"/></svg>`,
+  trend:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>`,
+  receipt:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>`,
+};
+/* Prognose für Alltagsausgaben bis Monatsende (nur aktueller Monat) */
+function forecast(ym, s){
+  if (ym !== CUR() || !s.tx.length) return null;
+  const day = new Date().getDate(), days = dim(ym);
+  const proj = s.vari / Math.max(day, 1) * days;
+  return {day, days, proj, left: s.freeFix - proj - s.savTx};
+}
 
 function renderHome(){
   const V = $("#view");
   if (!hasAnyData()){
-    V.innerHTML = `<div class="view"><div class="card hero"><div class="lbl">Willkommen 👋</div><div class="big" style="font-size:30px">Lass uns starten</div><div class="sub">Trag dein Gehalt für ${ymLabel(CUR())} und deine Fixkosten ein. Danach siehst du hier jeden Monat, wo dein Geld bleibt.</div></div>
+    V.innerHTML = `<div class="view"><div class="card hero"><div class="lbl">Willkommen 👋</div><div class="big" style="font-size:30px">Lass uns starten</div><div class="sub">Trag dein Gehalt und deine Fixkosten ein. Dann siehst du jeden Monat, was dir nach allen festen Kosten frei bleibt.</div></div>
       <button class="btn" onclick="editIncome()">💶 Gehalt eintragen</button>
       <button class="btn sec" onclick="editFixed()">🏠 Erste Fixkosten</button>
       <button class="btn sec" onclick="editLoan()">🏦 Kredit hinzufügen</button>
       <button class="btn sec" onclick="importFile()">📥 Backup importieren</button></div>`;
     return;
   }
-  const s = summary(SEL);
-  const quote = s.income ? Math.round((s.out - s.sav) / s.income * 100) : 0;
-  const parts = [["Fixkosten", s.fix, "var(--fix)"], ["Kredite", s.loans, "var(--loan)"], ["Variabel", s.vari, "var(--var)"], ["Sparen", s.sav, "var(--save)"], [s.free >= 0 ? "Frei" : "Fehlbetrag", Math.abs(s.free), s.free >= 0 ? "var(--free)" : "var(--danger)"]].filter(p => p[1] > 0.004 || p[0] === "Frei");
-  const totalRing = parts.reduce((a, p) => a + p[1], 0) || 1, base = Math.max(s.income, s.out) || 1;
-  const R = 60, C = 2 * Math.PI * R, GAP = parts.length > 1 ? 3 : 0;
-  let off = 0;
-  const segs = parts.map(([n,v,col]) => { const len = v / totalRing * C; const x = `<circle class="seg" cx="75" cy="75" r="${R}" fill="none" stroke="${col}" stroke-width="18" stroke-dasharray="0 ${C}" data-len="${Math.max(0,len-GAP)}" data-c="${C}" style="stroke-dashoffset:${-off}"><title>${n}: ${fmt(v)}</title></circle>`; off += len; return x; }).join("");
-  const maxC = s.perCat[0]?.sum || 1;
-  const loanBars = s.loans > 0 ? [{c:{id:"_loan", name:"Kredite", emoji:"🏦"}, sum:s.loans, n:D.loans.length}] : [];
-  const bars = [...s.perCat, ...loanBars].sort((a,b) => b.sum - a.sum);
-  const maxB = bars[0]?.sum || maxC;
-  const isCur = SEL === CUR();
+  const s = summary(SEL), isCur = SEL === CUR(), prev = addM(CUR(), -1), fc = forecast(SEL, s);
+  const fixQuote = pct(s.fixTotal, s.income);
+  const flowRows = [
+    ["Gehalt", s.salary, "+", s.est ? '<span class="tag o">geschätzt</span>' : ""],
+    ...(s.other > 0 ? [["Sonstige Eingänge", s.other, "+", ""]] : []),
+    ["Fixkosten", s.fix, "−", "", "var(--fix)"],
+    ...(s.loans > 0 ? [["Kreditraten", s.loans, "−", "", "var(--loan)"]] : []),
+    ...(s.savFix > 0 ? [["Sparen", s.savFix, "−", "", "var(--save)"]] : []),
+  ];
+  const barParts = [[s.fix, "var(--fix)"], [s.loans, "var(--loan)"], [s.savFix, "var(--save)"], [Math.max(0, s.freeFix), "var(--free)"]].filter(p => p[0] > 0.004);
+  const cats = [...s.perCatFix, ...(s.loans > 0 ? [{c:{id:"_loan", name:"Kredite", emoji:"🏦"}, sum:s.loans, n:D.loans.filter(l => loanCalc(l, SEL).pay > 0).length}] : [])].sort((a,b) => b.sum - a.sum);
+  const maxC = cats[0]?.sum || 1, topCats = cats.slice(0, 5), restCats = cats.slice(5);
+  // Demnächst fällig
   let upcoming = "";
   if (isCur){
     const list = [...s.fixed.map(x => ({x, kind:"fix", em:cat(x.cat).emoji})), ...D.loans.filter(l => loanCalc(l, SEL).pay > 0).map(l => ({x:{...l, amount:l.rate, interval:"monthly"}, kind:"loan", em:"🏦"}))]
-      .map(o => ({...o, d: nextDue(o.x)})).filter(o => o.d && o.x.day && daysUntil(o.d) <= 31).sort((a,b) => a.d - b.d).slice(0, 6);
-    upcoming = `<div class="card"><h3>Demnächst fällig <small>31 Tage</small></h3><div class="list">${list.map(({x,kind,em,d}) => { const dd = daysUntil(d);
-      return `<div class="item" onclick="${kind==="loan" ? `editLoan('${x.id}')` : `editFixed('${x.id}')`}"><div class="emo">${em}</div><div class="meta"><div class="n">${esc(x.name)}</div><div class="s">${d.toLocaleDateString("de-DE",{weekday:"short", day:"numeric", month:"short"})}</div></div><div style="text-align:right"><div class="a num">${fmt(x.amount)}</div><span class="due ${dd===0?"today":""}">${dd===0?"heute":dd===1?"morgen":"in "+dd+" Tagen"}</span></div></div>`; }).join("") || '<div class="empty">Nichts fällig 🎉<br><small>Trag bei Fixkosten einen Abbuchungstag ein.</small></div>'}</div></div>`;
+      .map(o => ({...o, d: nextDue(o.x)})).filter(o => o.d && o.x.day && daysUntil(o.d) <= 31).sort((a,b) => a.d - b.d).slice(0, 5);
+    if (list.length) upcoming = `<div class="card"><h3>Demnächst fällig <small>31 Tage</small></h3><div class="list">${list.map(({x,kind,em,d}) => { const dd = daysUntil(d);
+      return `<div class="item" onclick="${kind==="loan" ? `editLoan('${x.id}')` : `editFixed('${x.id}')`}"><div class="emo">${em}</div><div class="meta"><div class="n">${esc(x.name)}</div><div class="s">${d.toLocaleDateString("de-DE",{weekday:"short", day:"numeric", month:"short"})}</div></div><div style="text-align:right"><div class="a num">${fmt(x.amount)}</div><span class="due ${dd===0?"today":""}">${dd===0?"heute":dd===1?"morgen":"in "+dd+" Tagen"}</span></div></div>`; }).join("")}</div></div>`;
   }
+  // Alltag (optional)
+  const showAlltag = s.tx.length || SEL <= CUR();
+  const alltag = !showAlltag ? "" : `<div class="card opt">
+    <h3>Alltagsausgaben <small>optional · <a href="#" onclick="go('alltag');return false">${s.tx.length ? "alle ›" : "+ erfassen"}</a></small></h3>
+    ${s.tx.length ? `<div class="lg"><span style="color:var(--muted)">${isCur ? "Bisher erfasst" : "Erfasst"} (${s.tx.length} ${s.tx.length === 1 ? "Eintrag" : "Einträge"})</span><span class="v num">${fmt(s.vari + s.savTx)}</span></div>
+      ${fc ? `<div class="prog" style="margin:8px 0 12px"><div style="width:${Math.round(fc.day / fc.days * 100)}%;background:var(--var)"></div></div>
+      <div class="fcbox"><span style="color:var(--free)">${ICON.trend}</span><div>Prognose Monatsende: <b>~${fmt(fc.proj, true)} Alltag</b><br>voraussichtlich übrig: <b style="color:${fc.left >= 0 ? "var(--free)" : "var(--danger)"}">~${fmt(fc.left, true)}</b></div></div>`
+      : `<div class="lg" style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px"><b>Übrig nach Alltag</b><span class="v num" style="color:${s.free >= 0 ? "var(--free)" : "var(--danger)"}">${fmt(s.free)}</span></div>`}`
+    : `<p class="hint" style="margin:0">Nichts erfasst – das ist völlig okay. Wenn du Lust hast, erfasse Einkäufe & Co. und ich rechne hoch, was am Monatsende übrig bleibt.</p>`}
+  </div>`;
   const loanTotal = D.loans.reduce((a, l) => a + (loanPlan(l).bal || 0), 0);
+  const ends = D.loans.map(loanPlan).filter(p => !p.endless && p.months).sort((a,b) => b.end.localeCompare(a.end));
   V.innerHTML = `<div class="view">${monthBar()}
+    ${isCur && new Date().getDate() <= 10 && monthHasData(prev) ? `<div class="banner" onclick="openReview('${prev}')"><div class="be" style="color:var(--orange2)">${ICON.cal}</div><div>Dein <b>${ymLabel(prev, true)}.-Rückblick</b> ist fertig – ansehen ›</div></div>` : ""}
+    ${SEL < CUR() && monthHasData(SEL) ? `<div class="banner" onclick="openReview('${SEL}')"><div class="be" style="color:var(--orange2)">${ICON.cal}</div><div><b>Rückblick ${ymLabel(SEL)}</b> ansehen ›</div></div>` : ""}
     ${s.est && SEL <= CUR() ? `<div class="banner" onclick="incomeBanner()"><div class="be">💶</div><div>Gehalt für <b>${ymLabel(SEL)}</b> fehlt noch – ich rechne vorerst mit ${ymLabel(s.estFrom)}. <b>Jetzt eintragen ›</b></div></div>` : ""}
     <div class="card hero">
-      <div class="lbl">${s.free >= 0 ? (isCur ? "Übrig diesen Monat" : "Übrig im " + ymLabel(SEL, true) + ".") : "Fehlbetrag"}</div>
+      <div class="lbl">${s.freeFix >= 0 ? "Frei nach Fixkosten" : "Fixkosten übersteigen Eingang"}</div>
       <div class="big num" id="heroNum">${fmt(0, true)}</div>
-      <div class="sub">${s.est ? "Einnahmen geschätzt · " : ""}nach allen Ausgaben inkl. Sparen</div>
+      <div class="sub">${s.est ? "Gehalt geschätzt · " : ""}Eingang minus Fixkosten, Kredite und Sparen</div>
       <div class="row">
-        <div class="pill"><span>Einnahmen</span><b class="num">${fmt(s.income, true)}</b></div>
-        <div class="pill"><span>Ausgaben</span><b class="num">${fmt(s.out - s.sav, true)}</b></div>
-        <div class="pill"><span>Gespart</span><b class="num">${fmt(s.sav, true)}</b></div>
+        <div class="pill"><span>Eingang</span><b class="num">${fmt(s.income, true)}</b></div>
+        <div class="pill"><span>Fixkosten</span><b class="num">${fmt(s.fixTotal, true)}</b></div>
+        <div class="pill"><span>Fixquote</span><b class="num">${fixQuote} %</b></div>
       </div>
     </div>
     <div class="card">
-      <h3>Wohin dein Geld geht <small>${ymLabel(SEL)}</small></h3>
-      <div class="ringwrap">
-        <div class="ring"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="${R}" fill="none" stroke="#2A211A" stroke-width="18"/>${segs}</svg>
-          <div class="center"><div><b class="num">${quote}%</b><span>verbraucht</span></div></div></div>
-        <div class="legend">${parts.map(([n,v,col]) => `<div class="lg"><i style="background:${col}"></i>${n}<span class="v num">${fmt(v, true)}</span><span class="p num">${Math.round(v / base * 100)}%</span></div>`).join("")}</div>
+      <h3>Geldfluss ${ymLabel(SEL, true)}. <small><a href="#" onclick="go('inc');return false">Eingänge ›</a></small></h3>
+      <div class="flowbar">${barParts.map(([v, c]) => `<div style="flex:${v.toFixed(2)};background:${c}"></div>`).join("")}</div>
+      <div class="flow">
+        ${flowRows.map(([n, v, sg, tag, col]) => `<div class="lg" ${sg === "+" ? `onclick="go('inc')" style="cursor:pointer"` : ""}>${col ? `<i style="background:${col}"></i>` : ""}${n}${tag}<span class="v num" style="${sg === "+" ? "color:var(--free)" : ""}">${sg}${fmt(v)}</span></div>`).join("")}
+        <div class="lg total"><i style="background:${s.freeFix >= 0 ? "var(--free)" : "var(--danger)"}"></i><b>Frei verfügbar</b><span class="v num">${fmt(s.freeFix)}</span></div>
       </div>
     </div>
-    ${historyChart()}
     <div class="card">
-      <h3>Nach Kategorie <small>Fix + variabel</small></h3>
-      <div class="bars">${bars.map(g => `<div class="bar" onclick="${g.c.id==="_loan" ? "fixTab='loan';go('fix')" : "go('month')"}" title="${esc(g.c.name)}: ${fmt(g.sum)}"><div class="bt"><span>${g.c.emoji} ${esc(g.c.name)}<em>${g.n}×</em></span><b class="num">${fmt(g.sum)}<em>${s.income ? Math.round(g.sum / s.income * 100) : 0}%</em></b></div><div class="track"><div class="fill" data-w="${g.sum / maxB * 100}" ${g.c.saving ? 'style="background:var(--save)"' : g.c.id==="_loan" ? 'style="background:var(--loan)"' : ""}></div></div></div>`).join("") || '<div class="empty">Noch keine Ausgaben in diesem Monat</div>'}</div>
+      <h3>Fixkosten nach Kategorie <small><a href="#" onclick="go('fix');return false">alle ›</a></small></h3>
+      <div class="bars">${topCats.map(g => `<div class="bar" onclick="${g.c.id==="_loan" ? "fixTab='loan';go('fix')" : "go('fix')"}" title="${esc(g.c.name)}: ${fmt(g.sum)}"><div class="bt"><span>${g.c.emoji} ${esc(g.c.name)}<em>${g.n}×</em></span><b class="num">${fmt(g.sum)}<em>${pct(g.sum, s.fixTotal)}%</em></b></div><div class="track"><div class="fill" data-w="${g.sum / maxC * 100}" ${g.c.saving ? 'style="background:var(--save)"' : g.c.id==="_loan" ? 'style="background:var(--loan)"' : ""}></div></div></div>`).join("") || '<div class="empty">Keine Fixkosten in diesem Monat</div>'}
+      ${restCats.length ? `<div class="hint" style="margin:0">+ ${restCats.length} weitere ${restCats.length === 1 ? "Kategorie" : "Kategorien"} · ${fmt(restCats.reduce((a, g) => a + g.sum, 0))}</div>` : ""}</div>
     </div>
+    ${alltag}
     ${upcoming}
-    ${D.loans.length ? `<div class="card" onclick="fixTab='loan';go('fix')" style="cursor:pointer"><h3>Kredite <small>${D.loans.length} laufend ›</small></h3><div class="kv"><div><span>Restschuld</span><b class="num">${fmt(loanTotal, true)}</b></div><div><span>Rate/Monat</span><b class="num">${fmt(s.loans, true)}</b></div><div><span>Schuldenfrei</span><b>${(() => { const ends = D.loans.map(loanPlan).filter(p => !p.endless && p.months); return ends.length ? ymLabel(ends.sort((a,b) => b.months - a.months)[0].end, true) + " " + ends.sort((a,b) => b.months - a.months)[0].end.slice(0,4) : "–"; })()}</b></div></div></div>` : ""}
-    ${D.goals.length ? `<div class="card"><h3>Sparziele <small onclick="go('goals')" style="cursor:pointer">alle ›</small></h3>${D.goals.slice(0,3).map(goalRow).join("")}</div>` : ""}
+    ${D.loans.length ? `<div class="card" onclick="fixTab='loan';go('fix')" style="cursor:pointer"><h3>Kredite <small>${D.loans.length} ›</small></h3><div class="kv"><div><span>Restschuld</span><b class="num">${fmt(loanTotal, true)}</b></div><div><span>Rate/Monat</span><b class="num">${fmt(s.loans, true)}</b></div><div><span>Schuldenfrei</span><b>${ends.length ? ymLabel(ends[0].end, true) + " " + ends[0].end.slice(0,4) : "–"}</b></div></div></div>` : ""}
+    ${D.goals.length ? `<div class="card"><h3>Sparziele <small><a href="#" onclick="go('goals');return false">alle ›</a></small></h3>${D.goals.slice(0,3).map(goalRow).join("")}</div>` : ""}
   </div>`;
-  animate(s.free);
+  animate(s.freeFix);
 }
-function historyChart(){
-  const end = SEL > CUR() ? SEL : CUR();
-  const first = [...Object.keys(D.incomes), ...D.tx.map(t => t.date.slice(0,7)), ...D.fixed.map(f => f.from)].filter(Boolean).sort()[0] || end;
-  const months = []; for (let i = 5; i >= 0; i--){ const m = addM(end, -i); if (m >= first) months.push(m); }
-  if (months.length < 2) return "";
-  const data = months.map(m => ({m, ...summary(m)}));
-  const max = Math.max(...data.map(d => Math.max(d.income, d.out)), 1);
-  const W = 320, H = 140, top = 14, bot = 22, ch = H - top - bot, gw = W / months.length, bw = Math.min(16, gw * 0.28);
-  const bar = (x, v, col, est, label) => { const h = Math.max(2, v / max * ch), y = top + ch - h, r = Math.min(4, h / 2, bw / 2);
-    return `<path d="M${x},${top+ch} V${y+r} Q${x},${y} ${x+r},${y} H${x+bw-r} Q${x+bw},${y} ${x+bw},${y+r} V${top+ch} Z" fill="${col}" opacity="${est ? .4 : 1}"><title>${label}</title></path>`; };
-  const cols = data.map((d, i) => { const cx = gw * i + gw / 2, sel = d.m === SEL;
-    return `<g class="mcol" onclick="setMonth('${d.m}')">${sel ? `<rect x="${gw*i+3}" y="2" width="${gw-6}" height="${H-4}" rx="10" fill="rgba(255,122,26,.10)"/>` : ""}<rect x="${gw*i}" y="0" width="${gw}" height="${H}" fill="transparent"/>
-      ${bar(cx - bw - 1, d.income, "var(--inc)", d.est, `${ymLabel(d.m)} – Einnahmen: ${fmt(d.income)}${d.est ? " (geschätzt)" : ""}`)}
-      ${bar(cx + 1, d.out, "var(--fix)", false, `${ymLabel(d.m)} – Ausgaben inkl. Sparen: ${fmt(d.out)} · übrig ${fmt(d.free)}`)}
-      <text x="${cx}" y="${H-6}" text-anchor="middle" font-size="11" font-weight="${sel?800:600}" fill="${sel ? "var(--orange2)" : "var(--faint)"}">${ymLabel(d.m, true)}</text></g>`; }).join("");
-  return `<div class="card chart"><h3>Verlauf <small>tippe einen Monat</small></h3>
-    <div class="leg"><span><i style="background:var(--inc)"></i>Einnahmen</span><span><i style="background:var(--fix)"></i>Ausgaben inkl. Sparen</span></div>
-    <svg viewBox="0 0 ${W} ${H}"><line x1="0" x2="${W}" y1="${top+ch}" y2="${top+ch}" stroke="#33281F"/><line x1="0" x2="${W}" y1="${top}" y2="${top}" stroke="#241C15" stroke-dasharray="3 4"/><text x="${W}" y="${top-4}" text-anchor="end" font-size="10" fill="var(--faint)">${fmt(max, true)}</text>${cols}</svg>
-    <div class="list" style="margin-top:6px">${data.slice().reverse().slice(0,3).map(d => `<div class="lg" style="padding:4px 0">${ymLabel(d.m)}${d.est ? '<span class="tag">geschätzt</span>' : ""}<span class="v num" style="color:${d.free >= 0 ? "var(--free)" : "var(--danger)"}">${d.free >= 0 ? "+" : ""}${fmt(d.free, true)}</span></div>`).join("")}</div></div>`;
-}
+
 function animate(target){
   requestAnimationFrame(() => {
     document.querySelectorAll(".seg").forEach(s => s.style.strokeDasharray = `${s.dataset.len} ${s.dataset.c}`);
@@ -804,27 +891,141 @@ function animate(target){
   requestAnimationFrame(step);
 }
 
-/* Monat: Einnahmen + variable Ausgaben */
-function renderMonth(){
-  const s = summary(SEL), inc = incomesFor(SEL);
-  const groups = {}; s.tx.slice().sort((a,b) => b.date.localeCompare(a.date)).forEach(t => (groups[t.date] = groups[t.date] || []).push(t));
-  const varCats = {}; s.tx.forEach(t => { varCats[t.cat] = (varCats[t.cat] || 0) + t.amount; });
+/* Eingänge des Monats */
+function renderInc(){
+  const inc = incomesFor(SEL), s = summary(SEL);
+  const row = x => `<div class="item" onclick="editIncome('${x.id}')"><div class="emo">${isSalary(x) ? "💶" : "🎁"}</div><div class="meta"><div class="n">${esc(x.name)}${x.est ? '<span class="tag o">geschätzt</span>' : ""}</div><div class="s">${x.est ? "Wert aus " + ymLabel(inc.from) : x.note ? esc(x.note) : isSalary(x) ? "Gehalt" : "Sonstiger Eingang"}</div></div><div class="a num" style="color:var(--free)">+${fmt(x.amount)}</div></div>`;
+  const sal = inc.list.filter(isSalary), oth = inc.list.filter(x => !isSalary(x));
   $("#view").innerHTML = `<div class="view">${monthBar()}
-    <div class="card"><h3>Einnahmen <small class="num">${fmt(s.income)}</small></h3>
-      ${inc.est ? `<p class="hint" style="margin-top:0">Noch nichts für ${ymLabel(SEL)} eingetragen. Unten siehst du die Werte aus ${ymLabel(inc.from)}.</p>` : ""}
-      <div class="list">${inc.list.map(x => `<div class="item" onclick="editIncome('${x.id}')"><div class="emo">💶</div><div class="meta"><div class="n">${esc(x.name)}${inc.est ? '<span class="tag o">geschätzt</span>' : ""}</div><div class="s">${x.note ? esc(x.note) : ymLabel(SEL)}</div></div><div class="a num" style="color:var(--free)">+${fmt(x.amount)}</div></div>`).join("") || '<div class="empty"><span class="e">💶</span>Noch keine Einnahmen</div>'}</div>
-      <div class="btnrow">${inc.est ? `<button class="btn sec" onclick="confirmIncomes()">✓ Übernehmen</button>` : ""}<button class="btn" onclick="editIncome()">＋ Einnahme</button></div>
-    </div>
-    <div class="card"><h3>Variable Ausgaben <small class="num">${fmt(s.vari + s.tx.filter(t => isSaving(t.cat)).reduce((a,t) => a + t.amount, 0))}</small></h3>
-      <div class="btnrow" style="margin-top:0;margin-bottom:6px"><button class="btn" onclick="startOCR()">📷 Screenshot einlesen</button><button class="btn sec" onclick="editTx()">＋ Ausgabe</button></div>
-      ${Object.keys(varCats).length ? `<div class="chips" style="margin:10px 0 2px">${Object.entries(varCats).sort((a,b) => b[1]-a[1]).map(([c,v]) => `<span class="chip">${cat(c).emoji} <b class="num">${fmt(v, true)}</b></span>`).join("")}</div>` : ""}
-      ${Object.entries(groups).map(([d, list]) => `<div class="datehead">${new Date(d + "T12:00").toLocaleDateString("de-DE", {weekday:"long", day:"numeric", month:"long"})}</div><div class="list">${list.map(t => `<div class="item" onclick="editTx('${t.id}')"><div class="emo">${cat(t.cat).emoji}</div><div class="meta"><div class="n">${esc(t.name)}</div><div class="s">${esc(cat(t.cat).name)}${t.src === "ocr" ? " · 📷" : ""}</div></div><div class="a num">${fmt(t.amount)}</div></div>`).join("")}</div>`).join("") || '<div class="empty"><span class="e">🧾</span>Noch keine variablen Ausgaben.<br><small>Screenshot aus der Banking-App einlesen oder manuell erfassen.</small></div>'}
-    </div>
-    <div class="card" style="cursor:pointer" onclick="go('fix')"><h3>Fixkosten & Kredite <small>›</small></h3><div class="legend">
-      <div class="lg"><i style="background:var(--fix)"></i>Fixkosten<span class="v num">${fmt(s.fix)}</span></div>
-      <div class="lg"><i style="background:var(--save)"></i>Sparen (fest)<span class="v num">${fmt(s.fixed.filter(f => isSaving(f.cat)).reduce((a,f) => a + monthlyOf(f), 0))}</span></div>
-      <div class="lg"><i style="background:var(--loan)"></i>Kreditraten<span class="v num">${fmt(s.loans)}</span></div></div></div>
+    <div class="card"><h3>Gehalt <small class="num">${fmt(s.salary)}</small></h3>
+      ${inc.est ? `<p class="hint" style="margin-top:0">Für ${ymLabel(SEL)} ist noch kein Gehalt eingetragen – angezeigt wird der Wert aus ${ymLabel(inc.from)}.</p>` : ""}
+      <div class="list">${sal.map(row).join("") || '<div class="empty">Noch kein Gehalt</div>'}</div>
+      <div class="btnrow">${inc.est ? `<button class="btn sec" onclick="confirmIncomes()">✓ Übernehmen</button>` : ""}<button class="btn" onclick="editIncome(null,'gehalt')">＋ Gehalt</button></div></div>
+    <div class="card"><h3>Sonstige Eingänge <small class="num">${fmt(s.other)}</small></h3>
+      <p class="hint" style="margin-top:0">eBay-Verkäufe, Geschenke, Erstattungen … zählen zum Eingang, aber nicht zum Gehalt.</p>
+      <div class="list">${oth.map(row).join("")}</div>
+      <button class="addrow" onclick="editIncome(null,'sonstig')">＋ Sonstiger Eingang</button></div>
   </div>`;
+}
+
+/* Alltagsausgaben (optional) */
+function renderAlltag(){
+  const s = summary(SEL), fc = forecast(SEL, s);
+  const groups = {}; s.tx.slice().sort((a,b) => b.date.localeCompare(a.date)).forEach(t => (groups[t.date] = groups[t.date] || []).push(t));
+  const byCat = {}; s.tx.forEach(t => { byCat[t.cat] = (byCat[t.cat] || 0) + t.amount; });
+  $("#view").innerHTML = `<div class="view">${monthBar()}
+    <div class="card"><h3>Alltag ${ymLabel(SEL, true)}. <small class="num">${fmt(s.vari + s.savTx)}</small></h3>
+      ${fc ? `<div class="fcbox" style="margin-bottom:12px"><span style="color:var(--free)">${ICON.trend}</span><div>Tag ${fc.day} von ${fc.days} · Prognose: <b>~${fmt(fc.proj, true)}</b><br>Frei nach Fixkosten ${fmt(s.freeFix, true)} → übrig ca. <b style="color:${fc.left >= 0 ? "var(--free)" : "var(--danger)"}">${fmt(fc.left, true)}</b></div></div>`
+        : s.tx.length ? `<div class="lg" style="margin-bottom:10px"><span>Übrig nach Alltag</span><span class="v num" style="color:${s.free >= 0 ? "var(--free)" : "var(--danger)"}">${fmt(s.free)}</span></div>` : ""}
+      <div class="btnrow" style="margin-top:0"><button class="btn" onclick="editTx()">＋ Ausgabe</button><button class="btn sec" onclick="startOCR()">📷 Screenshot</button></div>
+      ${Object.keys(byCat).length ? `<div class="chips" style="margin:12px 0 2px">${Object.entries(byCat).sort((a,b) => b[1]-a[1]).map(([c,v]) => `<span class="chip">${cat(c).emoji} <b class="num">${fmt(v, true)}</b></span>`).join("")}</div>` : ""}
+      ${Object.entries(groups).map(([d, list]) => `<div class="datehead">${new Date(d + "T12:00").toLocaleDateString("de-DE", {weekday:"long", day:"numeric", month:"long"})}</div><div class="list">${list.map(t => `<div class="item" onclick="editTx('${t.id}')"><div class="emo">${cat(t.cat).emoji}</div><div class="meta"><div class="n">${esc(t.name)}</div><div class="s">${esc(cat(t.cat).name)}${t.src === "ocr" ? " · 📷" : ""}</div></div><div class="a num">${fmt(t.amount)}</div></div>`).join("")}</div>`).join("") || '<div class="empty"><span class="e">🧾</span>Noch nichts erfasst.<br><small>Ganz optional – tippe auf „Ausgabe“ oder lies einen Screenshot ein.</small></div>'}
+    </div>
+  </div>`;
+}
+
+/* Jahresübersicht */
+function realSalary(m){ return (D.incomes[m] || []).filter(isSalary).reduce((a, x) => a + (x.amount || 0), 0); }
+function renderYear(){
+  const curY = +CUR().slice(0,4); YEAR = YEAR || curY;
+  const years = [...new Set([...Object.keys(D.incomes), ...D.fixed.map(f => f.from), ...D.tx.map(t => t.date.slice(0,7))].filter(Boolean).map(m => +m.slice(0,4)))];
+  const yMin = Math.min(curY, ...years), yMax = Math.max(curY + 1, ...years);
+  const months = Array.from({length:12}, (_, i) => `${YEAR}-${pad2(i+1)}`);
+  const upto = YEAR < curY ? 12 : YEAR === curY ? +CUR().slice(5) : 0;
+  const data = months.map((m, i) => ({m, i, s: summary(m), sal: realSalary(m), past: i < upto}));
+  const got = data.filter(d => d.past && d.sal > 0);
+  const salSum = got.reduce((a, d) => a + d.sal, 0), avg = got.length ? salSum / got.length : 0;
+  const hi = got.slice().sort((a,b) => b.sal - a.sal)[0], lo = got.slice().sort((a,b) => a.sal - b.sal)[0];
+  const P = data.filter(d => d.past);
+  const sum = k => P.reduce((a, d) => a + d.s[k], 0);
+  const fixYear = data.reduce((a, d) => a + d.s.fixTotal, 0);
+  const max = Math.max(1, ...data.map(d => Math.max(d.past ? d.sal : d.s.salary, d.s.fixTotal)));
+  const H = 150;
+  $("#view").innerHTML = `<div class="view">
+    <div class="seg-ctl">${Array.from({length: yMax - yMin + 1}, (_, k) => yMin + k).slice(-4).map(y => `<button class="${y===YEAR?"on":""}" onclick="YEAR=${y};render()">${y}</button>`).join("")}</div>
+    ${upto ? `<div class="card hero">
+      <div class="lbl">Gehalt ${YEAR === curY ? "bisher erhalten" : YEAR}</div>
+      <div class="big num" id="heroNum">${fmt(0)}</div>
+      <div class="sub">${got.length} ${got.length === 1 ? "Monat" : "Monate"}${YEAR === curY && got.length ? ` · aufs Jahr hochgerechnet ~${fmt(avg * 12, true)}` : ""}</div>
+      <div class="row">
+        <div class="pill"><span>Ø Monat</span><b class="num">${fmt(avg, true)}</b></div>
+        <div class="pill"><span>Höchster</span><b class="num">${hi ? fmt(hi.sal, true) : "–"}</b><span style="text-transform:none;letter-spacing:0">${hi ? ymLabel(hi.m, true) : ""}</span></div>
+        <div class="pill"><span>Niedrigster</span><b class="num">${lo ? fmt(lo.sal, true) : "–"}</b><span style="text-transform:none;letter-spacing:0">${lo ? ymLabel(lo.m, true) : ""}</span></div>
+      </div></div>` : `<div class="card"><div class="empty"><span class="e">🗓️</span>${YEAR} liegt in der Zukunft – unten siehst du die geplanten Fixkosten.</div></div>`}
+    <div class="card"><h3>Gehalt pro Monat <small>Strich = Fixkosten gesamt</small></h3>
+      <div class="ychart" style="height:${H}px">${data.map(d => { const v = d.past ? d.sal : d.s.salary, h = Math.round(v / max * H), fh = Math.round(d.s.fixTotal / max * H), sel = d.m === SEL;
+        return `<button class="ycol ${sel ? "sel" : ""}" onclick="SEL='${d.m}';go('home')" aria-label="${ymLabel(d.m)}: Gehalt ${fmt(v)}, Fixkosten ${fmt(d.s.fixTotal)}" title="${ymLabel(d.m)} – Gehalt ${fmt(v)}${d.past ? "" : " (geschätzt)"} · Fix ${fmt(d.s.fixTotal)}"><i class="ybar" style="height:${h}px;${d.past ? "" : "opacity:.35"}"></i><i class="yfix" style="bottom:${fh}px"></i></button>`; }).join("")}</div>
+      <div class="ylbl">${data.map(d => `<span class="${d.m === CUR() ? "now" : ""}">${MONTHS[d.i][0]}</span>`).join("")}</div>
+    </div>
+    ${upto ? `<div class="card"><h3>Bilanz ${YEAR} <small>${upto === 12 ? "ganzes Jahr" : "Jan – " + MONTHS[upto-1].slice(0,3) + "."}</small></h3><div class="flow">
+      <div class="lg">Gehalt<span class="v num" style="color:var(--free)">+${fmt(salSum)}</span></div>
+      ${sum("other") > 0 ? `<div class="lg">Sonstige Eingänge<span class="v num" style="color:var(--free)">+${fmt(sum("other"))}</span></div>` : ""}
+      <div class="lg"><i style="background:var(--fix)"></i>Fixkosten<span class="v num">−${fmt(sum("fix"))}</span></div>
+      ${sum("loans") > 0 ? `<div class="lg"><i style="background:var(--loan)"></i>Kreditraten<span class="v num">−${fmt(sum("loans"))}</span></div>` : ""}
+      ${sum("sav") > 0 ? `<div class="lg"><i style="background:var(--save)"></i>Gespart<span class="v num">−${fmt(sum("sav"))}</span></div>` : ""}
+      ${sum("vari") > 0 ? `<div class="lg" style="color:var(--muted)">Alltag (erfasst, optional)<span class="v num">−${fmt(sum("vari"))}</span></div>` : ""}
+      <div class="lg total"><b>Übrig</b><span class="v num" style="color:${sum("free") >= 0 ? "var(--free)" : "var(--danger)"}">${fmt(salSum + sum("other") - sum("fix") - sum("loans") - sum("sav") - sum("vari"))}</span></div>
+    </div><p class="hint" style="margin:10px 0 0">Fixkosten inkl. Kredite & Sparen fürs ganze Jahr ${YEAR}: <b>${fmt(fixYear, true)}</b></p></div>` : ""}
+    <div class="card"><h3>Monate <small>tippen für Details</small></h3>
+      <div class="ytab"><span>Monat</span><span>Eingang</span><span>Fix</span><span>Frei</span>
+      ${data.filter(d => upto ? d.past : true).reverse().map(d => `<button class="ytrow" onclick="${d.m < CUR() ? `openReview('${d.m}')` : `SEL='${d.m}';go('home')`}"><span>${MONTHS[d.i].slice(0,3)}.${d.s.est ? " *" : ""} ›</span><span class="num">${fmt(d.s.income, true)}</span><span class="num">${fmt(d.s.fixTotal, true)}</span><b class="num" style="color:${d.s.freeFix >= 0 ? "var(--free)" : "var(--danger)"}">${fmt(d.s.freeFix, true)}</b></button>`).join("")}</div>
+      ${data.some(d => d.s.est && (upto ? d.past : true)) ? `<p class="hint" style="margin:8px 0 0">* Gehalt geschätzt (noch nicht eingetragen)</p>` : ""}
+    </div>
+  </div>`;
+  if (upto) animate(salSum); else animate(0);
+}
+
+/* Monatsrückblick */
+function openReview(m){ REVIEW = m; go("review"); }
+function renderReview(){
+  const M = REVIEW || addM(CUR(), -1), P = addM(M, -1), N = addM(M, 1);
+  const s = summary(M), p = summary(P), y = M.slice(0,4);
+  const dFree = s.free - p.free, dSal = s.salary - p.salary, dFixQ = pct(s.fixTotal, s.income) - pct(p.fixTotal, p.income);
+  const ins = [];
+  if (s.salary && p.salary && Math.abs(dSal) >= 1){
+    const yearSal = Array.from({length:12}, (_, i) => realSalary(`${y}-${pad2(i+1)}`)).filter(v => v > 0).sort((a,b) => b - a);
+    const rank = yearSal.indexOf(realSalary(M)) + 1;
+    ins.push([dSal > 0 ? "up" : "down", dSal > 0 ? "var(--free)" : "var(--danger)", `Gehalt <b>${fmt(Math.abs(dSal))} ${dSal > 0 ? "höher" : "niedriger"}</b> als im ${ymLabel(P, true)}.${rank > 0 && rank <= 3 && yearSal.length > 3 ? ` ${["Höchster", "Zweithöchster", "Dritthöchster"][rank-1]} Monat ${y}.` : ""}`]);
+  }
+  if (s.other > 0) ins.push(["plus", "var(--free)", `Sonstige Eingänge: <b>${fmt(s.other)}</b> (${(D.incomes[M] || []).filter(x => !isSalary(x)).map(x => esc(x.name)).join(", ")}).`]);
+  const big = s.perCatFix.filter(g => !g.c.saving)[0];
+  if (big) ins.push(["house", "var(--orange2)", `Größter Fixposten: <b>${esc(big.c.name)}</b> mit ${fmt(big.sum, true)} (${pct(big.sum, s.fixTotal)} % der Fixkosten).`]);
+  const prevNames = new Map(activeFixed(P).map(f => [f.name, f])), curNames = new Map(s.fixed.map(f => [f.name, f]));
+  s.fixed.forEach(f => { const o = prevNames.get(f.name); if (!o) ins.push(["plus", "var(--orange2)", `Neu: <b>${esc(f.name)}</b> (${fmt(monthlyOf(f))}/Monat).`]); else if (Math.abs(monthlyOf(o) - monthlyOf(f)) > 0.004) ins.push([monthlyOf(f) > monthlyOf(o) ? "up" : "down", monthlyOf(f) > monthlyOf(o) ? "var(--danger)" : "var(--free)", `<b>${esc(f.name)}</b>: ${fmt(monthlyOf(o))} → ${fmt(monthlyOf(f))}.`]); });
+  activeFixed(P).forEach(f => { if (!curNames.has(f.name)) ins.push(["down", "var(--free)", `Weggefallen: <b>${esc(f.name)}</b> (${fmt(monthlyOf(f))}/Monat).`]); });
+  D.loans.forEach(l => { const c = loanCalc(l, M), n = loanCalc(l, N); if (c.pay > 0 && n.pay === 0) ins.push(["card", "var(--free)", `🎉 <b>${esc(l.name)}</b> ist abbezahlt!`]); else if (c.pay > 0){ let k = 0, m = N; while (loanCalc(l, m).pay > 0 && k < 600){ k++; m = addM(m, 1); } ins.push(["card", "#C98BEB", `${esc(l.name)}: <b>noch ${k} ${k === 1 ? "Rate" : "Raten"}</b>${k ? `, fertig im ${ymLabel(addM(M, k))}` : ""}.`]); } });
+  D.goals.forEach(g => { const dep = (g.log || []).filter(x => x.d.slice(0,7) === M).reduce((a, x) => a + x.a, 0); if (dep) ins.push(["goal", "#8DB4FF", `Sparziel ${esc(g.name)}: <b>${dep > 0 ? "+" : ""}${fmt(dep, true)}</b>, jetzt bei ${Math.round(goalInfo(g).pct * 100)} %.`]); });
+  if (s.tx.length){ const bc = {}; s.tx.forEach(t => bc[t.cat] = (bc[t.cat] || 0) + t.amount); const top = Object.entries(bc).sort((a,b) => b[1]-a[1])[0]; ins.push(["receipt", "#D9B44A", `Alltag: ${fmt(s.vari + s.savTx, true)} in ${s.tx.length} Einträgen – am meisten für ${esc(cat(top[0]).name)}.`]); }
+  const n = summary(N), nextFree = s.salary + (n.other || 0) - n.fixTotal;
+  const tile = (lbl, val, sub, col) => `<div class="rtile"><span>${lbl}</span><b class="num">${val}</b><small style="color:${col || "var(--faint)"}">${sub}</small></div>`;
+  const diffTxt = (v, unit = "€") => Math.abs(v) < 0.5 ? "unverändert" : (v > 0 ? "+" : "−") + (unit === "€" ? fmt(Math.abs(v)) : Math.abs(v) + " Punkte") + ` ggü. ${ymLabel(P, true)}.`;
+  $("#view").innerHTML = `<div class="view">
+    <div class="hint" style="margin:0 0 10px">Abgeschlossen am ${dim(M)}.${M.slice(5)}.${M.slice(0,4)}</div>
+    <div class="card hero ${s.free >= 0 ? "green" : ""}">
+      <div class="lbl">${ymLabel(M)} · am Monatsende übrig</div>
+      <div class="big num" id="heroNum">${fmt(0)}</div>
+      ${monthHasData(P) ? `<div class="pill" style="display:inline-flex;align-items:center;gap:6px;flex:none">${dFree >= 0 ? ICON.up : ICON.down}<b style="font-size:13px;display:inline">${fmt(Math.abs(dFree))} ${dFree >= 0 ? "mehr" : "weniger"} als im ${ymLabel(P, true)}.</b></div>` : ""}
+    </div>
+    <div class="rgrid">
+      ${tile("Gehalt", fmt(s.salary), monthHasData(P) ? diffTxt(dSal) : "", dSal > 0.5 ? "var(--free)" : dSal < -0.5 ? "var(--danger)" : "")}
+      ${tile("Fixkosten gesamt", fmt(s.fixTotal), monthHasData(P) ? diffTxt(s.fixTotal - p.fixTotal) : "", s.fixTotal - p.fixTotal > 0.5 ? "var(--danger)" : s.fixTotal - p.fixTotal < -0.5 ? "var(--free)" : "")}
+      ${tile("Fixquote", pct(s.fixTotal, s.income) + " %", monthHasData(P) ? diffTxt(dFixQ, "pt") : "", dFixQ < 0 ? "var(--free)" : dFixQ > 0 ? "var(--danger)" : "")}
+      ${tile("Gespart", fmt(s.sav), "Sparquote " + pct(s.sav, s.income) + " %")}
+    </div>
+    <div class="card"><h3>So lief der Monat</h3><div class="flow">
+      <div class="lg">Gehalt<span class="v num" style="color:var(--free)">+${fmt(s.salary)}</span></div>
+      ${s.other > 0 ? `<div class="lg">Sonstige Eingänge<span class="v num" style="color:var(--free)">+${fmt(s.other)}</span></div>` : ""}
+      <div class="lg"><i style="background:var(--fix)"></i>Fixkosten<span class="v num">−${fmt(s.fix)}</span></div>
+      ${s.loans > 0 ? `<div class="lg"><i style="background:var(--loan)"></i>Kreditraten<span class="v num">−${fmt(s.loans)}</span></div>` : ""}
+      ${s.sav > 0 ? `<div class="lg"><i style="background:var(--save)"></i>Sparen<span class="v num">−${fmt(s.sav)}</span></div>` : ""}
+      ${s.vari > 0 ? `<div class="lg" style="color:var(--muted)">Alltag (${s.tx.length} Einträge, optional)<span class="v num">−${fmt(s.vari)}</span></div>` : ""}
+      <div class="lg total"><b>Übrig</b><span class="v num" style="color:${s.free >= 0 ? "var(--free)" : "var(--danger)"}">${fmt(s.free)}</span></div>
+    </div></div>
+    ${ins.length ? `<div class="card"><h3>Aufgefallen</h3><div class="ins">${ins.slice(0, 7).map(([ic, col, txt]) => `<div><span style="color:${col};background:color-mix(in srgb, ${col} 16%, transparent)">${ICON[ic]}</span><p>${txt}</p></div>`).join("")}</div></div>` : ""}
+    <div class="card opt"><h3>Ausblick ${ymLabel(N)}</h3><p class="hint" style="margin:0;color:#D8CBBE">Fixkosten gesamt <b style="color:var(--text)">${fmt(n.fixTotal, true)}</b>${Math.abs(n.fixTotal - s.fixTotal) > 0.5 ? ` (${n.fixTotal > s.fixTotal ? "+" : "−"}${fmt(Math.abs(n.fixTotal - s.fixTotal), true)})` : ""}. Bei einem Gehalt wie im ${ymLabel(M, true)}. bleiben dir rund <b style="color:var(--free)">${fmt(nextFree, true)}</b> frei.</p></div>
+    <button class="btn" onclick="SEL='${N > CUR() ? CUR() : N}';go('home')">Weiter zum ${ymLabel(N > CUR() ? CUR() : N, true)}.</button>
+  </div>`;
+  animate(s.free);
 }
 
 /* Fixkosten & Kredite */
@@ -919,44 +1120,71 @@ function shakeEl(el){ el.focus(); el.classList.add("shake"); setTimeout(() => el
 function confirmBtn(btn, label, fn){ btn.onclick = () => { if (btn.dataset.sure !== "1"){ btn.dataset.sure = "1"; btn.textContent = label; return; } fn(); }; }
 
 function openAddMenu(){
-  openSheet(`<h2>Was möchtest du erfassen?</h2><div class="tiles">
-    <button class="tile hi" onclick="editTx()"><span class="te">🧾</span><b>Ausgabe</b><span>Einkauf, Tanken, Essen gehen …</span></button>
-    <button class="tile hi" onclick="startOCR()"><span class="te">📷</span><b>Screenshot</b><span>Umsätze aus der Banking-App einlesen</span></button>
-    <button class="tile" onclick="editIncome()"><span class="te">💶</span><b>Einnahme</b><span>Gehalt für ${ymLabel(SEL)}</span></button>
-    <button class="tile" onclick="editFixed()"><span class="te">🏠</span><b>Fixkosten</b><span>Miete, Abos, Sparrate …</span></button>
-    <button class="tile" onclick="editLoan()"><span class="te">🏦</span><b>Kredit</b><span>Abzahlung mit Restschuld</span></button>
-    <button class="tile" onclick="editGoal()"><span class="te">🎯</span><b>Sparziel</b><span>Wofür sparst du?</span></button>
-  </div>`);
+  openSheet(`<h2>Was möchtest du erfassen?</h2><p class="hint" style="margin-top:-8px">für ${ymLabel(SEL)}</p>
+    <div class="grp">Fix & Eingänge</div>
+    <div class="tiles">
+      <button class="tile hi" onclick="editIncome(null,'gehalt')"><span class="te">💶</span><b>Gehalt</b><span>Gehalt ${ymLabel(SEL, true)}. eintragen</span></button>
+      <button class="tile hi" onclick="editFixed()"><span class="te">🏠</span><b>Fixkosten</b><span>Miete, Abos, Sparrate …</span></button>
+      <button class="tile" onclick="editLoan()"><span class="te">🏦</span><b>Kredit</b><span>Abzahlung mit Laufzeit</span></button>
+      <button class="tile" onclick="editGoal()"><span class="te">🎯</span><b>Sparziel</b><span>Wofür sparst du?</span></button>
+    </div>
+    <div class="grp">Sonstiges & optional</div>
+    <div class="list">
+      <button class="optrow" onclick="editIncome(null,'sonstig')"><span>🎁</span><div><b>Sonstiger Eingang</b><small>eBay-Verkauf, Geschenk …</small></div>›</button>
+      <button class="optrow" onclick="editTx()"><span>🧾</span><div><b>Alltagsausgabe</b><small>Einkauf, Tanken, Essen gehen</small></div>›</button>
+      <button class="optrow" onclick="startOCR()"><span>📷</span><div><b>Screenshot einlesen</b><small>Umsätze aus der Banking-App</small></div>›</button>
+    </div>`);
 }
 
 /* Einnahmen */
-async function materializeIncomes(){ const inc = incomesFor(SEL); if (inc.est) D.incomes[SEL] = inc.list.map(x => ({...x, id:uid()})); else if (!D.incomes[SEL]) D.incomes[SEL] = []; return inc; }
-function incomeBanner(){ const inc = incomesFor(SEL); if (inc.est && inc.list.length === 1) editIncome(inc.list[0].id); else go("month"); }
-async function confirmIncomes(){ await materializeIncomes(); await persist(); toast("✓ Einnahmen übernommen"); render(); }
-function editIncome(id){
+async function confirmIncomes(){
   const inc = incomesFor(SEL);
-  const x = id ? inc.list.find(i => i.id === id) : {name: !Object.keys(D.incomes).length ? "Gehalt" : ""};
-  const suggestions = [...new Set(Object.values(D.incomes).flat().map(i => i.name))].slice(0, 6);
-  openSheet(`<h2>${id ? "Einnahme" : "Neue Einnahme"} · ${ymLabel(SEL, true)}. ${SEL.slice(0,4)}</h2>
-    ${inc.est && id ? `<p class="hint">Wert aus ${ymLabel(inc.from)} – trag den tatsächlichen Betrag für ${ymLabel(SEL)} ein.</p>` : ""}
-    <div class="field"><input class="inp amount num" id="fAmt" inputmode="decimal" placeholder="0,00 €" value="${inc.est ? "" : amtStr(x.amount)}"></div>
-    ${inc.est && id ? `<p class="hint" style="text-align:center;margin-top:-6px">Letzter Monat: ${fmt(x.amount)}</p>` : ""}
-    <div class="field"><label>Bezeichnung</label><input class="inp" id="fName" value="${esc(x.name)}" placeholder="z. B. Gehalt" maxlength="60"></div>
-    ${!id && suggestions.length ? `<div class="chips" id="sugg" style="margin:-4px 0 14px">${suggestions.map(n => `<button class="chip">${esc(n)}</button>`).join("")}</div>` : ""}
-    <div class="field"><label>Notiz</label><input class="inp" id="fNote" value="${esc(x.note)}" placeholder="z. B. inkl. Überstunden" maxlength="80"></div>
-    <button class="btn" id="fSave">Speichern</button>${id ? '<button class="btn del" id="fDel">Löschen</button>' : ""}`);
-  if ($("#sugg")) $("#sugg").onclick = e => { const b = e.target.closest(".chip"); if (b) $("#fName").value = b.textContent; };
+  D.incomes[SEL] = [...inc.real, ...inc.list.filter(x => x.est).map(x => ({id: uid(), name: x.name, amount: x.amount, note: x.note || "", kind: "gehalt"}))];
+  await persist(); toast("✓ Gehalt übernommen"); render();
+}
+/* Repariert Monate, in die durch einen Fehler (bis 2.6.1) die Vormonats-Einträge mitkopiert wurden */
+function repairIncomeStack(){
+  const same = (a, b) => a && b && a.name === b.name && Math.abs((a.amount || 0) - (b.amount || 0)) < 0.005 && (a.note || "") === (b.note || "");
+  const months = Object.keys(D.incomes).sort(), orig = structuredClone(D.incomes);
+  let removed = 0, prev = null;
+  for (const m of months){
+    const L = D.incomes[m] || [];
+    if (prev && L.length > prev.length && prev.every((p, j) => same(p, L[j]))){ D.incomes[m] = L.slice(prev.length); removed += prev.length; }
+    if ((orig[m] || []).length) prev = orig[m];
+  }
+  return removed;
+}
+function incomeBanner(){ const est = incomesFor(SEL).list.filter(x => x.est); if (est.length === 1) editIncome(est[0].id); else go("inc"); }
+const OTHER_SUGG = ["eBay-Verkauf", "Geschenk", "Geburtstag", "Weihnachten", "Erstattung", "Kleinanzeigen"];
+function editIncome(id, kindArg){
+  const inc = incomesFor(SEL), item = id ? inc.list.find(i => i.id === id) : null, isEst = !!item?.est;
+  let kind = item ? (item.kind || "gehalt") : (kindArg || "gehalt");
+  const lastSal = inc.list.filter(isSalary).slice(-1)[0] || Object.values(D.incomes).flat().filter(isSalary).slice(-1)[0];
+  openSheet(`<h2>${item && !isEst ? "Eingang bearbeiten" : "Neuer Eingang"} · ${ymLabel(SEL, true)}. ${SEL.slice(0,4)}</h2>
+    <div class="seg-ctl" id="kSeg"><button data-k="gehalt" class="${kind==="gehalt"?"on":""}">💶 Gehalt</button><button data-k="sonstig" class="${kind!=="gehalt"?"on":""}">🎁 Sonstiger Eingang</button></div>
+    ${isEst ? `<p class="hint">Trag den tatsächlichen Betrag für ${ymLabel(SEL)} ein. ${ymLabel(inc.from)}: ${fmt(item.amount)}</p>` : ""}
+    <div class="field"><input class="inp amount num" id="fAmt" inputmode="decimal" placeholder="0,00 €" value="${item && !isEst ? amtStr(item.amount) : ""}"></div>
+    <div class="field"><label>Bezeichnung</label><input class="inp" id="fName" value="${esc(item ? item.name : kind === "gehalt" ? (lastSal?.name || "Gehalt") : "")}" placeholder="${kind === "gehalt" ? "z. B. Gehalt" : "z. B. eBay-Verkauf"}" maxlength="60"></div>
+    <div class="chips" id="sugg" style="margin:-4px 0 14px;${kind === "gehalt" ? "display:none" : ""}">${OTHER_SUGG.map(n => `<button class="chip">${n}</button>`).join("")}</div>
+    <div class="field"><label>Notiz</label><input class="inp" id="fNote" value="${esc(item && !isEst ? item.note : "")}" placeholder="${kind === "gehalt" ? "z. B. inkl. Erfolgsbeteiligung" : "z. B. Jacke verkauft"}" maxlength="80"></div>
+    <button class="btn" id="fSave">Speichern</button>${item && !isEst ? '<button class="btn del" id="fDel">Löschen</button>' : ""}`);
+  $("#kSeg").onclick = e => { const b = e.target.closest("button"); if (!b) return; kind = b.dataset.k;
+    $("#kSeg").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    $("#sugg").style.display = kind === "gehalt" ? "none" : "";
+    const n = $("#fName"); if (kind !== "gehalt" && /gehalt|lohn/i.test(n.value)) n.value = ""; if (kind === "gehalt" && !n.value) n.value = lastSal?.name || "Gehalt";
+    n.placeholder = kind === "gehalt" ? "z. B. Gehalt" : "z. B. eBay-Verkauf"; };
+  $("#sugg").onclick = e => { const b = e.target.closest(".chip"); if (b) $("#fName").value = b.textContent; };
   setTimeout(() => $("#fAmt").focus(), 350);
   $("#fSave").onclick = async e => {
     const amount = parseAmt($("#fAmt").value), name = $("#fName").value.trim();
     if (!amount) return shakeEl($("#fAmt")); if (!name) return shakeEl($("#fName"));
-    const wasEst = inc.est, idx = id ? inc.list.findIndex(i => i.id === id) : -1;
-    await materializeIncomes();
-    const obj = {id: uid(), name, amount, note: $("#fNote").value.trim()};
-    if (idx >= 0){ obj.id = D.incomes[SEL][idx].id; D.incomes[SEL][idx] = obj; } else D.incomes[SEL].push(obj);
-    await persist(); closeSheet(); celebrate(e); toast(wasEst ? "💶 " + ymLabel(SEL) + " eingetragen" : "✅ Gespeichert"); render();
+    const obj = {id: item && !isEst ? item.id : uid(), name, amount, note: $("#fNote").value.trim(), kind};
+    if (!Array.isArray(D.incomes[SEL])) D.incomes[SEL] = [];
+    const idx = item && !isEst ? D.incomes[SEL].findIndex(i => i.id === item.id) : -1;
+    if (idx >= 0) D.incomes[SEL][idx] = obj; else D.incomes[SEL].push(obj);
+    await persist(); closeSheet(); celebrate(e); toast(kind === "gehalt" ? "💶 Gehalt " + ymLabel(SEL) + " gespeichert" : "🎁 Eingang gespeichert"); render();
   };
-  if (id) confirmBtn($("#fDel"), "Wirklich löschen? Nochmal tippen", async () => { const idx = inc.list.findIndex(i => i.id === id); await materializeIncomes(); D.incomes[SEL].splice(idx, 1); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
+  if (item && !isEst) confirmBtn($("#fDel"), "Wirklich löschen? Nochmal tippen", async () => { D.incomes[SEL] = D.incomes[SEL].filter(i => i.id !== item.id); await persist(); closeSheet(); toast("🗑️ Gelöscht"); render(); });
 }
 
 /* Variable Ausgabe */
@@ -988,7 +1216,7 @@ function learn(name, catId){ const k = merchantKey(name); if (k) D.rules[k] = ca
 /* Fixkosten (versioniert) */
 function editFixed(id){
   const x = id ? D.fixed.find(i => i.id === id) : {interval:"monthly", cat: D.categories[0]?.id, month: new Date().getMonth()+1};
-  const startDefault = id ? (x.from > SEL ? x.from : SEL) : SEL;
+  const startDefault = id ? x.from : SEL;
   openSheet(`<h2>${id ? "Fixkosten bearbeiten" : "Neue Fixkosten"}</h2>
     <div class="field"><input class="inp amount num" id="fAmt" inputmode="decimal" placeholder="0,00 €" value="${amtStr(x.amount)}"></div>
     <div class="field"><label>Bezeichnung</label><input class="inp" id="fName" placeholder="z. B. Miete, Spotify, ETF-Sparplan" value="${esc(x.name)}" maxlength="60"></div>
@@ -998,23 +1226,33 @@ function editFixed(id){
       <div class="field"><label>Abbuchung am (Tag)</label><input class="inp num" id="fDay" inputmode="numeric" placeholder="optional" value="${x.day || ""}"></div>
       <div class="field" id="fMonthWrap"><label>Fällig im</label><select class="inp" id="fMonth">${MONTHS.map((m,i) => `<option value="${i+1}" ${i+1==x.month?"selected":""}>${m}</option>`).join("")}</select></div>
     </div>
-    <div class="field"><label>${id ? "Änderung gilt ab" : "Gilt ab"}</label><select class="inp" id="fFrom">${monthOptions(startDefault)}</select></div>
+    <div class="two">
+      <div class="field"><label>Startmonat</label><select class="inp" id="fFrom">${monthOptions(startDefault, 36, 24)}</select></div>
+      <div class="field"><label>Endet nach</label><select class="inp" id="fUntil">${monthOptions(x.until || "", 36, 60, true)}</select></div>
+    </div>
+    ${id ? `<div class="field hidden" id="fChgWrap"><label>Neuer Betrag gilt ab</label><select class="inp" id="fChg">${monthOptions(SEL > x.from ? SEL : x.from, 36, 24)}</select><p class="hint" style="margin:6px 0 0">Monate davor behalten den alten Betrag (Historie).</p></div>` : ""}
     <div class="field"><label>Notiz</label><input class="inp" id="fNote" placeholder="optional" value="${esc(x.note)}" maxlength="80"></div>
     <button class="btn" id="fSave">Speichern</button>
     ${id ? `<button class="btn sec" id="fEnd">Ab ${ymLabel(SEL)} beenden</button><button class="btn del" id="fDel">Komplett löschen (auch Historie)</button>` : ""}`);
   const upd = () => $("#fMonthWrap").style.visibility = $("#fInt .chip.on")?.dataset.id === "monthly" ? "hidden" : "visible";
   chipPick("#fCat"); chipPick("#fInt", upd); upd();
   if (!id) setTimeout(() => $("#fAmt").focus(), 350);
+  const moneyChanged = () => id && (parseAmt($("#fAmt").value) !== x.amount || ($("#fInt .chip.on")?.dataset.id || "monthly") !== x.interval || ($("#fCat .chip.on")?.dataset.id) !== x.cat);
+  const updChg = () => { if ($("#fChgWrap")) $("#fChgWrap").classList.toggle("hidden", !(moneyChanged() && $("#fChg").value > $("#fFrom").value)); };
+  if (id){ $("#fAmt").addEventListener("input", updChg); $("#fCat").addEventListener("click", () => setTimeout(updChg)); $("#fInt").addEventListener("click", () => setTimeout(updChg)); $("#fFrom").addEventListener("change", updChg); updChg(); }
   $("#fSave").onclick = async e => {
     const amount = parseAmt($("#fAmt").value), name = $("#fName").value.trim();
     if (!amount) return shakeEl($("#fAmt")); if (!name) return shakeEl($("#fName"));
-    const from = $("#fFrom").value;
+    const from = $("#fFrom").value, until = $("#fUntil").value || null;
+    if (until && until < from) return toast("❌ Ende liegt vor dem Start");
     const obj = {name, amount, interval: $("#fInt .chip.on")?.dataset.id || "monthly", cat: $("#fCat .chip.on")?.dataset.id || "sonst", day: Math.min(31, parseInt($("#fDay").value) || 0) || null, month: parseInt($("#fMonth").value) || 1, note: $("#fNote").value.trim()};
-    if (!id) D.fixed.push({...obj, id: uid(), from, until: null});
+    if (!id) D.fixed.push({...obj, id: uid(), from, until});
     else {
-      const money = obj.amount !== x.amount || obj.interval !== x.interval || obj.cat !== x.cat;
-      if (money && from > x.from){ x.until = addM(from, -1); D.fixed.push({...x, ...obj, id: uid(), from, until: null, prev: x.id}); D.fixed = D.fixed.map(f => f.id === x.id ? {...x, until: addM(from, -1)} : f); }
-      else D.fixed = D.fixed.map(f => f.id === id ? {...f, ...obj, from: from < f.from ? from : f.from} : f);
+      const chg = $("#fChg")?.value;
+      if (moneyChanged() && chg && chg > from && (!until || chg <= until)){
+        D.fixed = D.fixed.map(f => f.id === id ? {...f, from, until: addM(chg, -1)} : f);   // alter Betrag bis Vormonat
+        D.fixed.push({...x, ...obj, id: uid(), from: chg, until, prev: x.id});               // neuer Betrag ab „chg“
+      } else D.fixed = D.fixed.map(f => f.id === id ? {...f, ...obj, from, until} : f);
     }
     await persist(); closeSheet(); celebrate(e); toast(id ? "✅ Gespeichert" : "✨ Hinzugefügt"); render();
   };
@@ -1253,11 +1491,11 @@ function reviewOCR(found){
       if (!el.querySelector("input[type=checkbox]").checked) return;
       const r = rows.find(x => x.id === el.dataset.id), name = el.querySelector("input.on").value.trim() || r.name;
       const amount = parseAmt(el.querySelector(".oamt").value) || r.amount, catId = el.querySelector("select").value, date = el.querySelector("input[type=date]").value || r.date;
-      if (r.income){ const ym = date.slice(0,7); if (!Array.isArray(D.incomes[ym])) D.incomes[ym] = []; D.incomes[ym].push({id: uid(), name, amount, note:"aus Screenshot"}); ni++; return; }
+      if (r.income){ const ym = date.slice(0,7); if (!Array.isArray(D.incomes[ym])) D.incomes[ym] = []; D.incomes[ym].push({id: uid(), name, amount, note:"aus Screenshot", kind: /gehalt|lohn|bezüge|entgelt/i.test(name) ? "gehalt" : "sonstig"}); ni++; return; }
       D.tx.push({id: uid(), date, name, amount, cat: catId, src:"ocr"}); learn(name, catId); n++;
     });
     if (!n && !ni) return;
-    await persist(); closeSheet(); celebrate(e); toast(`📷 ${n} Ausgaben${ni ? ` · ${ni} Einnahmen` : ""} übernommen`); go("month");
+    await persist(); closeSheet(); celebrate(e); toast(`📷 ${n} Ausgaben${ni ? ` · ${ni} Einnahmen` : ""} übernommen`); go("alltag");
   };
 }
 

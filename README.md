@@ -1,16 +1,17 @@
 # 🟠 Budget – mein privates Haushaltsbuch
 
-**Aktuelle Version: 2.6.1** · siehe [Versionsverlauf](#-versionsverlauf)
+**Aktuelle Version: 3.0.0** · siehe [Versionsverlauf](#-versionsverlauf)
 
 Web-App fürs iPhone (wie das LadeLog).
 
-**Funktionen (v2)**
-- **Monate mit Historie:** Gehalt jeden Monat neu eintragen (schwankt ja), Verlauf der letzten 6 Monate
-- **Fixkosten versioniert:** Änderung „gilt ab Monat X“ – frühere Monate bleiben korrekt
-- **Sparen zählt als Ausgabe** (Kategorie 🐷), nichts wird doppelt gerechnet
-- **Variable Ausgaben** manuell oder per **Screenshot aus der Banking-App** – Texterkennung läuft lokal auf dem iPhone, Kategorien werden vorgeschlagen und die App lernt aus deinen Korrekturen
-- **Kredite/Abzahlungen** mit Restschuld, Zins, Restlaufzeit und „schuldenfrei im …“
-- **Sparziele** frei definierbar, mit Fortschritt, nötiger Monatsrate und Einzahlungen
+**Funktionen (v3 – Fixkosten-Analyse)**
+- **Übersicht:** Hauptzahl „Frei nach Fixkosten“ (Eingang − Fixkosten − Kredite − Sparen), Geldfluss, Fixquote, Fixkosten nach Kategorie
+- **Eingänge:** Gehalt pro Monat (schwankt) plus **Sonstige Eingänge** (eBay-Verkauf, Geschenke …) – getrennt vom Gehalt
+- **Jahr:** Gehalt gesamt, Ø, höchster/niedrigster Monat, Diagramm mit Fixkosten, Jahresbilanz, Monatstabelle
+- **Monatsrückblick:** öffnet sich beim ersten Start im neuen Monat; später über Übersicht (Vormonat wählen) oder Jahr → Monat erneut abrufbar
+- **Fixkosten versioniert** (Startmonat, Ende, „neuer Betrag gilt ab“), **Kredite** (auch mit Start in der Zukunft), **Sparziele**
+- **Alltagsausgaben optional** – manuell oder per Screenshot, mit Prognose, was am Monatsende übrig bleibt
+- PIN + Touch ID / Face ID, AES-256, verschlüsselter Sync zwischen Geräten
 
 ## So bleibt alles privat
 
@@ -87,6 +88,18 @@ Neue Dateien über **Add file → Upload files** hochladen (gleichnamige werden 
 ## 📜 Versionsverlauf
 
 Schema: **Haupt.Neben.Fehlerbehebung** – z. B. 2.1.0 = neue Funktionen, 2.1.1 = nur Fehler behoben, 3.0.0 = großer Umbau.
+
+### 3.0.0 – 27.11.2026
+- 🧭 Neue Ausrichtung als **Fixkosten-Analyse**: Hauptzahl „Frei nach Fixkosten“, Geldfluss-Karte, Fixquote
+- 📊 Neuer Tab **Jahr** (ersetzt „Monat“): Gehalt gesamt, Ø, höchster/niedrigster Monat, Diagramm, Jahresbilanz, Monatstabelle
+- 📅 **Monatsrückblick** mit Vergleich zum Vormonat, Fixquote, Sparquote, automatischen Erkenntnissen (Gehaltsänderung, neue/geänderte/weggefallene Fixkosten, Kreditstand, Sparziele) und Ausblick
+- 🎁 **Sonstige Eingänge** getrennt vom Gehalt; bestehende Einträge werden automatisch zugeordnet (Name mit „Gehalt/Lohn“ = Gehalt)
+- 🧾 Alltagsausgaben als optionaler Bereich mit **Prognose Monatsende**; erreichbar über die Übersicht
+- ➕ Erfassen-Menü: Gehalt und Fixkosten zuerst, Sonstiges & Alltag darunter
+
+### 2.6.2 – 27.11.2026
+- 🐞 Gehalt stapelte sich über die Monate (geschätzter Vormonatswert wurde beim Hinzufügen als echter Eintrag mitkopiert) – behoben; betroffene Monate werden beim ersten Öffnen automatisch bereinigt
+- 🐞 Fixkosten: Startmonat wird beim Bearbeiten korrekt angezeigt (nicht mehr der gerade gewählte Monat); neues Feld „Endet nach“; „Neuer Betrag gilt ab“ erscheint nur bei Betragsänderung
 
 ### 2.6.1 – 27.11.2026
 - 🐞 Kredite mit Start in der Zukunft: Startmonat („Erste Rate im“) wird nicht mehr auf den aktuellen Monat zurückgesetzt; Raten zählen erst ab der ersten Rate; Laufzeit und Enddatum werden ab Start berechnet; Feld heißt dann „Kreditbetrag zum Start“
