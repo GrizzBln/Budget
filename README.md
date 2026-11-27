@@ -1,6 +1,6 @@
 # 🟠 Budget – mein privates Haushaltsbuch
 
-**Aktuelle Version: 2.6.0** · siehe [Versionsverlauf](#-versionsverlauf)
+**Aktuelle Version: 2.6.1** · siehe [Versionsverlauf](#-versionsverlauf)
 
 Web-App fürs iPhone (wie das LadeLog).
 
@@ -87,6 +87,9 @@ Neue Dateien über **Add file → Upload files** hochladen (gleichnamige werden 
 ## 📜 Versionsverlauf
 
 Schema: **Haupt.Neben.Fehlerbehebung** – z. B. 2.1.0 = neue Funktionen, 2.1.1 = nur Fehler behoben, 3.0.0 = großer Umbau.
+
+### 2.6.1 – 27.11.2026
+- 🐞 Kredite mit Start in der Zukunft: Startmonat („Erste Rate im“) wird nicht mehr auf den aktuellen Monat zurückgesetzt; Raten zählen erst ab der ersten Rate; Laufzeit und Enddatum werden ab Start berechnet; Feld heißt dann „Kreditbetrag zum Start“
 
 ### 2.6.0 – 27.11.2026
 - 🔓 Entsperren mit Touch ID / Face ID über einen Passkey (WebAuthn-PRF): *Einstellungen → Touch ID / Face ID* einschalten. Die PIN wird mit einem Schlüssel verschlüsselt, den nur der Fingerabdruck freigibt; PIN bleibt als Ausweg. Fingerabdruck-Taste unten links im Tastenfeld. Benötigt iOS 18 oder neuer.

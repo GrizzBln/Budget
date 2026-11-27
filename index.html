@@ -341,8 +341,10 @@ nav.tabs .fab:active{transform:scale(.92)}
    Alle Daten: AES-256-GCM verschlüsselt im Browser.
    Im Code (und damit auf GitHub) stehen KEINE persönlichen Zahlen.
    ========================================================= */
-const APP_VERSION = "2.6.0";
+const APP_VERSION = "2.6.1";
 const CHANGELOG = [
+  {v:"2.6.1", d:"27.11.2026", items:[
+    "🐞 Kredite mit Start in der Zukunft: Startmonat wird nicht mehr auf den aktuellen Monat zurückgesetzt, Raten zählen erst ab der ersten Rate, Laufzeit und Enddatum stimmen"]},
   {v:"2.6.0", d:"27.11.2026", items:[
     "🔓 Entsperren mit Touch ID / Face ID (Passkey) – einschalten unter Einstellungen; PIN bleibt als Ausweg"]},
   {v:"2.5.0", d:"27.11.2026", items:[
@@ -663,10 +665,13 @@ function loanCalc(l, ym){
   return {pay, bal:b};
 }
 function loanPlan(l){
-  const r = (l.interest || 0) / 1200; let b = loanCalc(l, CUR()).bal ?? l.balance, m = CUR(), n = 0, interest = 0;
-  if (b > 0 && l.rate <= b * r) return {endless:true, bal:b};
+  const r = (l.interest || 0) / 1200, future = CUR() < l.asOf;
+  // Startpunkt: heute – oder bei Krediten in der Zukunft der Monat vor der ersten Rate
+  let m = future ? l.asOf : CUR(), b = future ? l.balance : (loanCalc(l, CUR()).bal ?? l.balance);
+  const start = m, startBal = b; let n = 0, interest = 0;
+  if (b > 0 && l.rate <= b * r) return {endless:true, bal:b, future};
   while (b > 0.005 && n < 1200){ m = addM(m, 1); const i = b * r; interest += i; b = b + i - Math.min(l.rate, b + i); n++; }
-  return {bal: loanCalc(l, CUR()).bal ?? l.balance, months:n, end: n ? addM(CUR(), n) : CUR(), interest};
+  return {bal: startBal, months:n, end: n ? addM(start, n) : start, interest, future, first: future ? addM(l.asOf, 1) : null};
 }
 
 function summary(ym){
@@ -832,9 +837,9 @@ function fixRow(x){
 function loanCard(l){
   const c = loanCalc(l, SEL), p = loanPlan(l), bal = p.bal;
   const paidPct = l.original ? Math.max(0, Math.min(100, (1 - bal / l.original) * 100)) : null;
-  return `<div class="card loan" onclick="editLoan('${l.id}')" style="cursor:pointer"><div class="lt"><div><div class="ln">🏦 ${esc(l.name)}</div><div class="ll">${esc(l.lender || "")}${l.interest ? (l.lender ? " · " : "") + String(l.interest).replace(".", ",") + " % Zins" : ""}</div></div><div class="lb num">${fmt(bal, true)}<small>Restschuld</small></div></div>
+  return `<div class="card loan" onclick="editLoan('${l.id}')" style="cursor:pointer"><div class="lt"><div><div class="ln">🏦 ${esc(l.name)}</div><div class="ll">${esc(l.lender || "")}${l.interest ? (l.lender ? " · " : "") + String(l.interest).replace(".", ",") + " % Zins" : ""}</div></div><div class="lb num">${fmt(bal, true)}<small>${p.future ? "Kreditbetrag" : "Restschuld"}</small></div></div>
     ${paidPct != null ? `<div class="track"><div class="fill" data-w="${paidPct}"></div></div><div class="ll">${Math.round(paidPct)} % von ${fmt(l.original, true)} getilgt</div>` : ""}
-    <div class="kv"><div><span>Rate</span><b class="num">${fmt(l.rate, true)}</b></div><div><span>Noch</span><b>${p.endless ? "∞" : p.months + " Raten"}</b></div><div><span>Fertig</span><b>${p.endless ? "Rate zu klein" : p.months ? ymLabel(p.end, true) + " " + p.end.slice(0,4) : "✓"}</b></div></div>
+    <div class="kv"><div><span>Rate</span><b class="num">${fmt(l.rate, true)}</b></div><div><span>${p.future ? "Start" : "Noch"}</span><b>${p.future ? ymLabel(p.first, true) + " " + p.first.slice(2,4) : p.endless ? "∞" : p.months + " Raten"}</b></div><div><span>Fertig</span><b>${p.endless ? "Rate zu klein" : p.months ? ymLabel(p.end, true) + " " + p.end.slice(0,4) : "✓"}</b></div></div>
     ${l.interest && !p.endless && p.interest > 1 ? `<div class="ll" style="margin-top:8px">Noch ca. ${fmt(p.interest, true)} Zinsen bis zum Ende</div>` : ""}
     ${c.pay === 0 && SEL >= (l.from || l.asOf) ? `<div class="ll" style="margin-top:8px;color:var(--free)">🎉 In ${ymLabel(SEL)} abbezahlt</div>` : ""}</div>`;
 }
@@ -1031,22 +1036,22 @@ function editLoan(id){
       <div class="field"><label>Zinssatz % p.a.</label><input class="inp num" id="lInt" inputmode="decimal" value="${amtStr(x.interest)}" placeholder="z. B. 4,9 (opt.)"></div>
     </div>
     <div class="two">
-      <div class="field"><label>Restschuld aktuell</label><input class="inp num" id="lBal" inputmode="decimal" value="${curBal != null ? amtStr(Math.round(curBal*100)/100) : ""}" placeholder="0,00"></div>
+      <div class="field"><label id="lBalLbl">${x.from > CUR() ? "Kreditbetrag zum Start" : "Restschuld aktuell"}</label><input class="inp num" id="lBal" inputmode="decimal" value="${curBal != null ? amtStr(Math.round(curBal*100)/100) : ""}" placeholder="0,00"></div>
       <div class="field"><label>Ursprünglich</label><input class="inp num" id="lOrig" inputmode="decimal" value="${amtStr(x.original)}" placeholder="optional"></div>
     </div>
     <div class="two">
-      <div class="field"><label>Läuft seit</label><select class="inp" id="lFrom">${monthOptions(x.from || CUR(), 120, 6)}</select></div>
+      <div class="field"><label>Erste Rate im</label><select class="inp" id="lFrom">${monthOptions(x.from || CUR(), 120, 36)}</select></div>
       <div class="field"><label>Abbuchung am</label><input class="inp num" id="lDay" inputmode="numeric" value="${x.day || ""}" placeholder="Tag (opt.)"></div>
     </div>
     <div class="preview" id="lPrev">Trag Rate und Restschuld ein – ich rechne aus, wann du schuldenfrei bist.</div>
     <button class="btn" id="lSave">Speichern</button>${id ? '<button class="btn del" id="lDel">Kredit löschen</button>' : ""}`);
-  const read = () => ({...x, name:$("#lName").value.trim(), lender:$("#lLender").value.trim(), rate:parseAmt($("#lRate").value), interest:parseAmt($("#lInt").value) || 0, balance:parseAmt($("#lBal").value), original:parseAmt($("#lOrig").value) || null, from:$("#lFrom").value, asOf:CUR(), day: Math.min(31, parseInt($("#lDay").value) || 0) || null});
+  const read = () => ({...x, name:$("#lName").value.trim(), lender:$("#lLender").value.trim(), rate:parseAmt($("#lRate").value), interest:parseAmt($("#lInt").value) || 0, balance:parseAmt($("#lBal").value), original:parseAmt($("#lOrig").value) || null, from:$("#lFrom").value, asOf: $("#lFrom").value > CUR() ? addM($("#lFrom").value, -1) : CUR(), day: Math.min(31, parseInt($("#lDay").value) || 0) || null});
   const prev = () => { const l = read(); if (!l.rate || !l.balance){ return; } const p = loanPlan(l);
-    $("#lPrev").innerHTML = p.endless ? "⚠️ Die Rate deckt nicht einmal die Zinsen – bitte prüfen." : `Noch <b>${p.months} Raten</b> · schuldenfrei im <b>${ymLabel(p.end)}</b>${l.interest ? `<br>Zinsen bis dahin ca. <b>${fmt(p.interest, true)}</b>` : "<br><small>Ohne Zinssatz rechne ich zinsfrei (z. B. 0 %-Finanzierung).</small>"}`; };
-  ["#lRate","#lInt","#lBal"].forEach(s => $(s).addEventListener("input", prev)); prev();
+    $("#lPrev").innerHTML = p.endless ? "⚠️ Die Rate deckt nicht einmal die Zinsen – bitte prüfen." : `${p.future ? `Erste Rate im <b>${ymLabel(p.first)}</b><br>` : ""}${p.future ? "" : "Noch "}<b>${p.months} Raten</b> · schuldenfrei im <b>${ymLabel(p.end)}</b>${l.interest ? `<br>Zinsen bis dahin ca. <b>${fmt(p.interest, true)}</b>` : "<br><small>Ohne Zinssatz rechne ich zinsfrei (z. B. 0 %-Finanzierung).</small>"}`; };
+  const lbl = () => { $("#lBalLbl").textContent = $("#lFrom").value > CUR() ? "Kreditbetrag zum Start" : "Restschuld aktuell"; };
+  ["#lRate","#lInt","#lBal"].forEach(s => $(s).addEventListener("input", prev)); $("#lFrom").addEventListener("change", () => { lbl(); prev(); }); prev();
   $("#lSave").onclick = async e => {
     const l = read(); if (!l.name) return shakeEl($("#lName")); if (!l.rate) return shakeEl($("#lRate")); if (!l.balance) return shakeEl($("#lBal"));
-    if (l.from > l.asOf) l.from = l.asOf;
     if (id) D.loans = D.loans.map(o => o.id === id ? l : o); else D.loans.push({...l, id: uid()});
     await persist(); closeSheet(); celebrate(e); toast("🏦 Kredit gespeichert"); fixTab = "loan"; if (current !== "home") go("fix"); else render();
   };
