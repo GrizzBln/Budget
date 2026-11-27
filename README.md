@@ -1,6 +1,6 @@
 # 🟠 Budget – mein privates Haushaltsbuch
 
-**Aktuelle Version: 2.1.0** · siehe [Versionsverlauf](#-versionsverlauf)
+**Aktuelle Version: 2.5.0** · siehe [Versionsverlauf](#-versionsverlauf)
 
 Web-App fürs iPhone (wie das LadeLog).
 
@@ -27,7 +27,7 @@ Web-App fürs iPhone (wie das LadeLog).
 1. Auf <https://github.com> einloggen → oben rechts **+** → **New repository**
    - Name: `budget` · Sichtbarkeit: **Public** (nötig für kostenloses GitHub Pages – siehe oben, im Code steht nichts Privates)
    - **Create repository**
-2. Auf der leeren Repo-Seite: **uploading an existing file** → alle Dateien aus diesem Ordner hineinziehen (inkl. Ordner `icons`) → **Commit changes**
+2. Auf der leeren Repo-Seite: **uploading an existing file** → alle Dateien aus diesem Ordner hineinziehen (inkl. Ordner `icons` und `sounds`) → **Commit changes**
 3. **Settings → Pages** → *Source*: **Deploy from a branch** → Branch **main** / **(root)** → **Save**
 4. Nach 1–2 Minuten läuft die App unter `https://DEIN-NAME.github.io/budget/`
 
@@ -50,6 +50,30 @@ Web-App fürs iPhone (wie das LadeLog).
 
 Danach lädt die App nach jeder Änderung automatisch hoch und holt beim Entsperren den neuesten Stand.
 
+## Weitere Personen
+
+Die App kann jeder mit dem Link nutzen – **jede Person hat ihren eigenen, getrennten Tresor** auf ihrem iPhone mit eigener PIN. Niemand sieht die Zahlen der anderen.
+
+1. In der App: *Einstellungen → Für eine andere Person einrichten → Link teilen*
+2. Die Person öffnet den Link in **Safari** → Teilen → **Zum Home-Bildschirm**
+3. App öffnen, eigene PIN festlegen – fertig
+
+### Partner über dein GitHub (ohne eigenes Konto)
+
+Erstelle für deinen Partner einen **zweiten Token** (gleiches Vorgehen wie bei dir, nur Repo `budget-daten`, *Contents: Read and write*, Name z. B. `Budget-Partner`). So kannst du seinen Zugang jederzeit einzeln widerrufen.
+
+In seiner App unter *Einstellungen → Sync über GitHub*:
+
+| Feld | Gemeinsames Haushaltsbudget | Getrenntes eigenes Budget |
+|---|---|---|
+| Benutzername | dein GitHub-Name | dein GitHub-Name |
+| Repo | `budget-daten` | `budget-daten` |
+| Token | sein Token | sein Token |
+| Dateiname | `budget.enc.json` (wie bei dir) | eigener, z. B. `budget-partner.enc.json` |
+| Sync-Passwort | **dasselbe** wie deins | **eigenes** |
+
+Beim getrennten Budget kann er deine Datei ohne dein Sync-Passwort nicht lesen.
+
 ## Updates
 
 Neue Dateien über **Add file → Upload files** hochladen (gleichnamige werden ersetzt). In der App dann einfach **von oben nach unten ziehen** – sie erkennt die neue Version und lädt sie. Die Versionsnummer steht unter *Einstellungen → Version*.
@@ -63,6 +87,23 @@ Neue Dateien über **Add file → Upload files** hochladen (gleichnamige werden 
 ## 📜 Versionsverlauf
 
 Schema: **Haupt.Neben.Fehlerbehebung** – z. B. 2.1.0 = neue Funktionen, 2.1.1 = nur Fehler behoben, 3.0.0 = großer Umbau.
+
+### 2.5.0 – 27.11.2026
+- 💸 Viel mehr Geld: ca. 45 Scheine – Schwall vom Speichern-Knopf plus Geldregen von oben über den ganzen Bildschirm
+- 💶 Realistischere Scheine im Stil der Euro-Serie (5 € bis 200 €): echte Farben, Torbogen-Motiv je Schein, Sternenkranz, Silberstreifen, „EURO ΕΥΡΩ“ – bewusst stilisiert (keine Banknoten-Kopie)
+- ➕ Plus-Knopf in der unteren Leiste exakt zentriert, rund und weiß
+
+### 2.4.0 – 27.11.2026
+- 💰 Neuer Standard-Sound „Katsching!“ als Datei `sounds/katsching.mp3` (Stille entfernt, auf 1,6 s gekürzt, lauter) – andere Sounds weiter wählbar
+- ⚠️ Beim Update den Ordner `sounds` mit hochladen
+
+### 2.3.0 – 27.11.2026
+- 🎵 Eigener Sound: kurze Audiodatei (MP3, M4A, WAV) aus der Dateien-App als Speicher-Sound wählen – bleibt nur auf dem Gerät (nicht auf GitHub), Stille am Anfang wird abgeschnitten, max. 4 Sekunden
+
+### 2.2.0 – 27.11.2026
+- 🤑 Neuer Standard-Sound „Ka-Sching!“ (Verkaufs-Sound im eBay-Stil, selbst erzeugt) – wählbar: Ka-Sching, Registrierkasse, Münzen oder aus (*Einstellungen → Sound*, antippen zum Anhören)
+- 📲 *Für eine andere Person einrichten*: Link teilen + Kurzanleitung in der App
+- ☁️ Sync: frei wählbarer Dateiname – getrennte oder gemeinsame Budgets im selben Repo
 
 ### 2.1.0 – 27.11.2026
 - 💶 Kassen-Sound („Ka-Ching“) beim Speichern – in den Einstellungen abschaltbar (bei aktivem Stummschalter am iPhone ggf. lautlos)
