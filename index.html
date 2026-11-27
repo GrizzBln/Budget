@@ -291,6 +291,8 @@ nav.tabs .fab:active{transform:scale(.92)}
 /* Realistischere Scheine (stilisiert, Bild per SVG) */
 .bill{background:none no-repeat center/100% 100%;box-shadow:0 5px 12px rgba(0,0,0,.4);border-radius:3px}
 .bill::before,.bill::after{display:none}
+.key.bio{color:var(--orange2);display:grid;place-items:center}
+.key.bio.hidden{display:grid!important;visibility:hidden}
 </style>
 </head>
 <body>
@@ -339,8 +341,10 @@ nav.tabs .fab:active{transform:scale(.92)}
    Alle Daten: AES-256-GCM verschlüsselt im Browser.
    Im Code (und damit auf GitHub) stehen KEINE persönlichen Zahlen.
    ========================================================= */
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.6.0";
 const CHANGELOG = [
+  {v:"2.6.0", d:"27.11.2026", items:[
+    "🔓 Entsperren mit Touch ID / Face ID (Passkey) – einschalten unter Einstellungen; PIN bleibt als Ausweg"]},
   {v:"2.5.0", d:"27.11.2026", items:[
     "💸 Viel mehr Geld: Schwall vom Knopf plus Geldregen von oben über den ganzen Bildschirm",
     "💶 Realistischere Scheine im Stil der Euro-Serie (5 € bis 200 €, mit Torbogen-Motiv, Sternen und Silberstreifen)",
@@ -484,13 +488,14 @@ async function persist(touch = true){
 let pinBuf = "", pinMode = "unlock", pinFirst = "";
 function buildPad(){
   $("#dots").innerHTML = Array.from({length:PIN_LEN}, () => '<div class="dot"></div>').join("");
-  $("#pad").innerHTML = ["1","2","3","4","5","6","7","8","9","","0","⌫"].map(k => k === "" ? "<span></span>" : `<button class="key ${k==="⌫"?"ghost":""}" data-k="${k}">${k}</button>`).join("");
+  $("#pad").innerHTML = ["1","2","3","4","5","6","7","8","9","bio","0","⌫"].map(k => k === "bio" ? `<button class="key ghost bio hidden" data-k="bio" aria-label="Mit Touch ID / Face ID entsperren">${BIO_ICON}</button>` : `<button class="key ${k==="⌫"?"ghost":""}" data-k="${k}">${k}</button>`).join("");
   $("#pad").onclick = e => { const b = e.target.closest(".key"); if (b) pinKey(b.dataset.k); };
   document.addEventListener("keydown", e => { if ($("#lock").classList.contains("hidden")) return; if (/^\d$/.test(e.key)) pinKey(e.key); else if (e.key === "Backspace") pinKey("⌫"); });
 }
 function drawDots(){ [...$("#dots").children].forEach((d,i) => d.classList.toggle("on", i < pinBuf.length)); }
 function failPin(msg){ $("#dots").classList.remove("shake"); void $("#dots").offsetWidth; $("#dots").classList.add("shake"); $("#lockMsg").textContent = msg; pinBuf = ""; setTimeout(drawDots, 200); }
 async function pinKey(k){
+  if (k === "bio") return bioUnlock(true);
   if (k === "⌫"){ pinBuf = pinBuf.slice(0,-1); drawDots(); return; }
   if (pinBuf.length >= PIN_LEN) return;
   pinBuf += k; drawDots();
@@ -503,19 +508,25 @@ async function pinKey(k){
     SALT = crypto.getRandomValues(new Uint8Array(16)); KEY = await deriveKey(pin, SALT);
     D = normalize(D); takeSnap(); await persist(false); pinBuf = ""; enterApp(true); return;
   }
+  if (!(await unlockWith(pin))) failPin("Falsche PIN");
+}
+async function unlockWith(pin){
   $("#lockMsg").textContent = "Entsperre …";
   try{
     const v = JSON.parse(localStorage.getItem(VAULT)); SALT = unb64(v.salt);
     const key = await deriveKey(pin, SALT); const raw = await openWith(key, v);
     KEY = key; D = normalize(raw); takeSnap(); if (!raw.v || raw.v < 2) await persist(false);
-    pinBuf = ""; enterApp(false);
-  }catch(e){ failPin("Falsche PIN"); }
+    pinBuf = ""; enterApp(false); return true;
+  }catch(e){ return false; }
 }
 function showLock(mode){
   pinMode = mode; pinBuf = ""; drawDots();
   $("#lockMsg").textContent = mode === "unlock" ? "PIN eingeben" : "Wähle eine 6-stellige PIN";
   $("#lockNote").textContent = mode === "unlock" ? "Deine Daten liegen verschlüsselt nur auf diesem Gerät." : "Mit dieser PIN werden deine Daten auf diesem Gerät verschlüsselt. Ohne PIN kommt niemand an deine Zahlen – auch du nicht. Merk sie dir gut.";
   $("#lock").classList.remove("hidden"); $("#app").classList.add("hidden"); $("#tabs").classList.add("hidden"); closeSheet();
+  const bioKey = document.querySelector('.key[data-k="bio"]');
+  if (bioKey) bioKey.classList.toggle("hidden", !(mode === "unlock" && bioEnabled()));
+  if (mode === "unlock" && bioEnabled()){ $("#lockMsg").textContent = "Touch ID / Face ID oder PIN"; setTimeout(() => bioUnlock(false), 350); }
 }
 function lockNow(){ KEY = null; D = null; showLock("unlock"); }
 function enterApp(first){
@@ -533,6 +544,84 @@ document.addEventListener("visibilitychange", () => {
   else if (KEY && D?.settings?.sync) pullSync(true);
 });
 setInterval(() => { if (KEY && !document.hidden && D?.settings?.sync && !$("#sheet").classList.contains("on")) pullSync(true); }, 3 * 60 * 1000);
+
+/* ---------- Touch ID / Face ID (Passkey + PRF-Erweiterung) ----------
+   Die PIN wird mit einem Schlüssel verschlüsselt, den nur der Passkey nach
+   biometrischer Bestätigung liefert (WebAuthn-PRF). Ohne Fingerabdruck/Gesicht
+   bleibt die PIN unlesbar. Gespeichert nur auf diesem Gerät. */
+const BIO = "budget.bio.v1";
+const BIO_ICON = `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M7.5 4.6A8.5 8.5 0 0 1 20.5 12M3.5 12a8.5 8.5 0 0 1 1.6-5M12 7a5 5 0 0 1 5 5c0 2.5-.4 4.6-1.2 6.4M7 12a5 5 0 0 1 1.5-3.6M7 12c0 3-.6 5.2-1.6 6.8M12 11.5c0 3.6-.8 6.4-2.2 8.5M12 11.5v.5M16.6 20.2c.3-.8.6-1.7.8-2.7M3.6 15.5c.3-1 .4-2.2.4-3.5"/></svg>`;
+let bioBusy = false;
+const bioData = () => { try { return JSON.parse(localStorage.getItem(BIO)); } catch { return null; } };
+const bioEnabled = () => !!bioData() && !!window.PublicKeyCredential;
+const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+async function bioSupported(){
+  if (!window.PublicKeyCredential || !navigator.credentials) return false;
+  try { if (!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) return false; } catch { return false; }
+  try { if (PublicKeyCredential.getClientCapabilities){ const c = await PublicKeyCredential.getClientCapabilities(); if (c && c["extension:prf"] === false) return false; } } catch {}
+  return true;
+}
+async function bioKeyFrom(prfOut){
+  const base = await crypto.subtle.importKey("raw", prfOut, "HKDF", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"HKDF", hash:"SHA-256", salt:new Uint8Array(32), info:enc.encode("budget-bio-v1")}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+}
+async function bioPrf(credId, salt){
+  const a = await navigator.credentials.get({publicKey:{challenge:rnd(32), allowCredentials:[{type:"public-key", id:credId}], userVerification:"required", timeout:60000, extensions:{prf:{eval:{first:salt}}}}});
+  const out = a?.getClientExtensionResults?.().prf?.results?.first;
+  if (!out) throw new Error("noprf");
+  return out;
+}
+async function bioEnable(pin){
+  const salt = rnd(32);
+  const cred = await navigator.credentials.create({publicKey:{
+    rp:{name:"Budget"}, user:{id:rnd(16), name:"budget-" + location.hostname, displayName:"Budget-App"},
+    challenge:rnd(32), pubKeyCredParams:[{type:"public-key", alg:-7}, {type:"public-key", alg:-257}],
+    authenticatorSelection:{authenticatorAttachment:"platform", residentKey:"required", userVerification:"required"},
+    timeout:60000, extensions:{prf:{eval:{first:salt}}}}});
+  const ext = cred.getClientExtensionResults?.() || {};
+  if (ext.prf && ext.prf.enabled === false) throw new Error("noprf");
+  const credId = new Uint8Array(cred.rawId);
+  const out = ext.prf?.results?.first || await bioPrf(credId, salt);
+  const box = await sealWith(await bioKeyFrom(out), {pin});
+  localStorage.setItem(BIO, JSON.stringify({credId:b64(credId), salt:b64(salt), ...box}));
+}
+async function bioRewrap(newPin){
+  const b = bioData(); if (!b) return;
+  try { const out = await bioPrf(unb64(b.credId), unb64(b.salt)); const box = await sealWith(await bioKeyFrom(out), {pin:newPin}); localStorage.setItem(BIO, JSON.stringify({...b, ...box})); return true; }
+  catch { localStorage.removeItem(BIO); return false; }
+}
+async function bioUnlock(userTap){
+  if (bioBusy || KEY || !bioEnabled()) return;
+  bioBusy = true;
+  try{
+    const b = bioData();
+    const out = await bioPrf(unb64(b.credId), unb64(b.salt));
+    const {pin} = await openWith(await bioKeyFrom(out), b);
+    if (!(await unlockWith(pin))){ localStorage.removeItem(BIO); failPin("PIN eingeben – Touch ID neu einrichten"); }
+  }catch(e){
+    if (userTap){ $("#lockMsg").textContent = e.name === "NotAllowedError" ? "Abgebrochen – PIN eingeben" : "Touch ID nicht verfügbar – PIN eingeben"; }
+  }finally{ bioBusy = false; }
+}
+function bioSettings(){
+  if (bioEnabled()){
+    openSheet(`<h2>🔓 Touch ID / Face ID</h2><p class="hint">Ist auf diesem Gerät aktiv. Beim Öffnen erscheint automatisch die Abfrage – die PIN funktioniert weiterhin als Ausweg.</p>
+      <button class="btn sec" id="bioTest">Jetzt testen</button><button class="btn del" id="bioOff">Ausschalten</button>`);
+    $("#bioTest").onclick = async () => { const b = bioData(); try { await bioPrf(unb64(b.credId), unb64(b.salt)); toast("✅ Erkannt"); } catch { toast("❌ Nicht bestätigt"); } };
+    confirmBtn($("#bioOff"), "Wirklich ausschalten? Nochmal tippen", () => { localStorage.removeItem(BIO); closeSheet(); toast("Touch ID / Face ID ausgeschaltet"); renderSet(); });
+    return;
+  }
+  openSheet(`<h2>🔓 Touch ID / Face ID</h2><p class="hint">Entsperre die App mit Fingerabdruck oder Gesicht statt PIN. Dafür legt dein iPhone einen <b>Passkey</b> für diese App an (im iCloud-Schlüsselbund). Bestätige zur Sicherheit einmal deine PIN.</p>
+    <div class="field"><label>Deine PIN</label><input class="inp num" id="bp" type="password" inputmode="numeric" maxlength="${PIN_LEN}" autocomplete="off"></div>
+    <button class="btn" id="bioOn">Aktivieren</button>`);
+  setTimeout(() => $("#bp").focus(), 300);
+  $("#bioOn").onclick = async () => {
+    const pin = $("#bp").value;
+    try { await openWith(await deriveKey(pin, SALT), JSON.parse(localStorage.getItem(VAULT))); } catch { return toast("❌ PIN falsch"); }
+    if (!(await bioSupported())) return toast("❌ Auf diesem Gerät/Browser nicht verfügbar");
+    try { await bioEnable(pin); closeSheet(); celebrate(); toast("🔓 Touch ID / Face ID aktiviert"); renderSet(); }
+    catch(e){ toast(e.message === "noprf" ? "❌ Dieser Browser unterstützt das leider nicht (iOS 18 oder neuer nötig)" : e.name === "NotAllowedError" ? "Abgebrochen" : "❌ Einrichten fehlgeschlagen"); }
+  };
+}
 
 /* ---------- Navigation ---------- */
 const TITLES = {home:"Übersicht", month:"Monat", fix:"Fixkosten", goals:"Sparziele", set:"Einstellungen"};
@@ -802,6 +891,7 @@ function renderSet(){
       ${s ? `<div class="set" onclick="pushSync()"><div class="ic">⬆️</div>Jetzt hochladen</div><div class="set" onclick="pullSync(false)"><div class="ic">⬇️</div>Vom Server laden</div>` : ""}
     </div>
     <div class="card"><h3>Sicherheit & Daten</h3>
+      <div class="set" onclick="bioSettings()"><div class="ic">🔓</div>Touch ID / Face ID<span class="toggle ${bioEnabled() ? "on" : ""}"></span></div>
       <div class="set" onclick="changePin()"><div class="ic">🔑</div>PIN ändern</div>
       <div class="set" onclick="exportFile()"><div class="ic">📤</div>Verschlüsseltes Backup exportieren</div>
       <div class="set" onclick="importFile()"><div class="ic">📥</div>Backup importieren</div>
@@ -1203,7 +1293,9 @@ function changePin(){
     try { await openWith(await deriveKey(p0, SALT), JSON.parse(localStorage.getItem(VAULT))); } catch { return toast("❌ Aktuelle PIN falsch"); }
     if (!new RegExp(`^\\d{${PIN_LEN}}$`).test(p1)) return toast(`❌ Neue PIN: ${PIN_LEN} Ziffern`);
     if (p1 !== p2) return toast("❌ PINs stimmen nicht überein");
-    SALT = crypto.getRandomValues(new Uint8Array(16)); KEY = await deriveKey(p1, SALT); await persist(false); closeSheet(); toast("🔑 PIN geändert");
+    SALT = crypto.getRandomValues(new Uint8Array(16)); KEY = await deriveKey(p1, SALT); await persist(false); closeSheet();
+    if (bioEnabled()){ toast("🔑 PIN geändert – bitte Touch ID bestätigen"); const ok = await bioRewrap(p1); toast(ok ? "🔑 PIN geändert · Touch ID aktualisiert" : "🔑 PIN geändert · Touch ID bitte neu einrichten"); renderSet(); }
+    else toast("🔑 PIN geändert");
   };
 }
 function askPassword(title, hint, confirm){
@@ -1237,7 +1329,7 @@ $("#fileIn").onchange = async e => {
 };
 function wipe(){
   openSheet(`<h2>Alles löschen?</h2><p class="hint">Löscht den verschlüsselten Tresor auf diesem Gerät. Ein GitHub-Sync-Stand bleibt erhalten. Tippe LÖSCHEN zur Bestätigung.</p><div class="field"><input class="inp" id="w" placeholder="LÖSCHEN"></div><button class="btn" style="background:var(--danger)" id="ok">Endgültig löschen</button>`);
-  $("#ok").onclick = () => { if ($("#w").value.trim().toUpperCase() !== "LÖSCHEN") return; localStorage.removeItem(VAULT); D = null; KEY = null; closeSheet(); showLock("setup1"); };
+  $("#ok").onclick = () => { if ($("#w").value.trim().toUpperCase() !== "LÖSCHEN") return; localStorage.removeItem(VAULT); localStorage.removeItem(BIO); D = null; KEY = null; closeSheet(); showLock("setup1"); };
 }
 
 /* ---------- GitHub-Sync (Ende-zu-Ende verschlüsselt) ---------- */
