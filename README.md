@@ -1,6 +1,6 @@
 # 🟠 Budget – mein privates Haushaltsbuch
 
-**Aktuelle Version: 3.2.0** · siehe [Versionsverlauf](#-versionsverlauf)
+**Aktuelle Version: 3.3.0** · siehe [Versionsverlauf](#-versionsverlauf)
 
 Web-App fürs iPhone (wie das LadeLog).
 
@@ -12,6 +12,7 @@ Web-App fürs iPhone (wie das LadeLog).
 - **Fixkosten versioniert** (Startmonat, Ende, „neuer Betrag gilt ab“), **Kredite** (auch mit Start in der Zukunft), **Sparziele**
 - **Kontoauszüge (PDF) importieren** – auch ein ganzes Jahr auf einmal, inkl. Zinsen vom Tagesgeld (siehe unten)
 - **Alltagsausgaben optional** – manuell oder per Screenshot, mit Prognose, was am Monatsende übrig bleibt
+- **9 Designs** (Einstellungen → Design), pro Gerät/Person wählbar
 - PIN + Touch ID / Face ID, AES-256, verschlüsselter Sync zwischen Geräten
 
 ## So bleibt alles privat
@@ -106,6 +107,11 @@ Neue Dateien über **Add file → Upload files** hochladen (gleichnamige werden 
 ## 📜 Versionsverlauf
 
 Schema: **Haupt.Neben.Fehlerbehebung** – z. B. 2.1.0 = neue Funktionen, 2.1.1 = nur Fehler behoben, 3.0.0 = großer Umbau.
+
+### 3.3.0 – 28.11.2026
+- 🎨 9 Designs unter *Einstellungen → Design*: **Glut** (Orange), **Sonnenblume** (Gelb), **Zitronensorbet** (Gelb, hell), **Abendrot** (Koralle/Pink), **Tiefsee** (Türkis/Blau), **Matcha** (Grün, hell), **Mitternacht** (Lila Neon), **Kirschblüte** (Rosa, hell), **Graphit** (schwarz-weiß)
+- 👤 Pro Gerät bzw. Person – wird nicht synchronisiert; auch der Sperrbildschirm erscheint im gewählten Design
+- Alle Farben laufen jetzt über Design-Variablen (Akzent, Karten, Schrift, Verlauf, Leuchten, Tab-Leiste)
 
 ### 3.2.0 – 28.11.2026
 - 🏦 Import an Revolut-Auszüge angepasst (Spalten Geldausgang/Geldeingang, Abschnitte Girokonto/Einzahlung, Kontoinhaber-Erkennung)
