@@ -1,6 +1,6 @@
 # 🟠 Budget – mein privates Haushaltsbuch
 
-**Aktuelle Version: 3.0.0** · siehe [Versionsverlauf](#-versionsverlauf)
+**Aktuelle Version: 3.2.0** · siehe [Versionsverlauf](#-versionsverlauf)
 
 Web-App fürs iPhone (wie das LadeLog).
 
@@ -10,6 +10,7 @@ Web-App fürs iPhone (wie das LadeLog).
 - **Jahr:** Gehalt gesamt, Ø, höchster/niedrigster Monat, Diagramm mit Fixkosten, Jahresbilanz, Monatstabelle
 - **Monatsrückblick:** öffnet sich beim ersten Start im neuen Monat; später über Übersicht (Vormonat wählen) oder Jahr → Monat erneut abrufbar
 - **Fixkosten versioniert** (Startmonat, Ende, „neuer Betrag gilt ab“), **Kredite** (auch mit Start in der Zukunft), **Sparziele**
+- **Kontoauszüge (PDF) importieren** – auch ein ganzes Jahr auf einmal, inkl. Zinsen vom Tagesgeld (siehe unten)
 - **Alltagsausgaben optional** – manuell oder per Screenshot, mit Prognose, was am Monatsende übrig bleibt
 - PIN + Touch ID / Face ID, AES-256, verschlüsselter Sync zwischen Geräten
 
@@ -51,6 +52,23 @@ Web-App fürs iPhone (wie das LadeLog).
 
 Danach lädt die App nach jeder Änderung automatisch hoch und holt beim Entsperren den neuesten Stand.
 
+## Kontoauszüge (PDF) importieren
+
+*Plus-Menü → Kontoauszüge (PDF)*, oder unter *Jahr*, *Eingänge* bzw. *Einstellungen*. Mehrere PDFs auf einmal auswählen (z. B. alle Auszüge eines Jahres aus der Dateien-App).
+
+- Ausgewertet wird **nur auf dem Gerät**. Beim ersten Mal lädt die App den PDF-Leser (pdf.js, ca. 2 MB) von cdn.jsdelivr.net – deine PDFs werden nicht übertragen.
+- Passwortgeschützte PDFs: Die App fragt nach dem Passwort.
+- Automatische Zuordnung, vor dem Übernehmen prüfbar:
+  - **Gehalt** → ersetzt/ergänzt das Gehalt des Monats (schon vorhandene gleiche Beträge werden erkannt)
+  - **Zinsen** → pro Monat zu einem Eintrag zusammengefasst (netto, Steuern abgezogen), aus allen Konten/Unterkonten; werden erfasst, aber **nicht als Einnahme** gezählt
+  - **Abbuchungen, die zu Fixkosten oder Kreditraten passen** → nur bestätigt, nicht doppelt gezählt
+  - **Wiederkehrende Abbuchungen** (≥ 3 Monate) → Vorschlag „als neue Fixkosten anlegen“
+  - **Umbuchungen** zu Unterkonten/Tagesgeld, Überweisungen an/von dir selbst und ans Gemeinschaftskonto → ignoriert (umstellbar)
+  - **Mehrere Konten im PDF** (z. B. Revolut: Girokonto + „Einzahlung“-Unterkonten) → du wählst, welche berücksichtigt werden (Standard: nur Girokonto)
+  - **Auswahl:** alles einzeln an-/abhakbar, „alle an/aus“ je Abschnitt; Alltagsausgaben und unklare Eingänge (PayPal, Erstattungen, Personen) sind standardmäßig nicht angehakt
+  - Rest → Alltagsausgaben (optional) oder sonstige Eingänge
+- Funktioniert mit Text-PDFs (Vorzeichen, S/H oder Soll-/Haben-Spalten). Eingescannte Auszüge (Bilder) werden nicht erkannt.
+
 ## Weitere Personen
 
 Die App kann jeder mit dem Link nutzen – **jede Person hat ihren eigenen, getrennten Tresor** auf ihrem iPhone mit eigener PIN. Niemand sieht die Zahlen der anderen.
@@ -88,6 +106,18 @@ Neue Dateien über **Add file → Upload files** hochladen (gleichnamige werden 
 ## 📜 Versionsverlauf
 
 Schema: **Haupt.Neben.Fehlerbehebung** – z. B. 2.1.0 = neue Funktionen, 2.1.1 = nur Fehler behoben, 3.0.0 = großer Umbau.
+
+### 3.2.0 – 28.11.2026
+- 🏦 Import an Revolut-Auszüge angepasst (Spalten Geldausgang/Geldeingang, Abschnitte Girokonto/Einzahlung, Kontoinhaber-Erkennung)
+- 🗂️ Kontenauswahl in der Prüfliste – Standard: nur das Girokonto
+- 📈 Zinsen je Monat zusammengefasst (aus allen Unterkonten) und **nicht mehr als Einnahme** gezählt – angezeigt als „Zinsen erhalten · nicht eingerechnet“
+- 🔁 Umbuchungen zu Unterkonten, Eigenüberweisungen und Gemeinschaftskonto werden erkannt
+- ☑️ „alle an/aus“ je Abschnitt; Alltag und unklare Eingänge standardmäßig abgewählt; strengerer Fixkosten-Abgleich (keine Zufallstreffer bei gleichem Betrag); bessere Namen und Kategorien
+
+### 3.1.0 – 28.11.2026
+- 📄 Kontoauszüge als PDF einlesen – mehrere auf einmal für ein ganzes Jahr, passwortgeschützte PDFs möglich, Auswertung nur auf dem Gerät
+- 🔎 Automatische Zuordnung mit Prüfliste: Gehalt (ersetzt/ergänzt), Zinsen, sonstige Eingänge, Abgleich mit Fixkosten & Kreditraten, wiederkehrende Abbuchungen als neue Fixkosten, Umbuchungen ignorieren, Rest als Alltag; Doppelte werden erkannt
+- 📈 Neue Eingangsart **Zinsen** (Tagesgeld, netto nach Kapitalertragsteuer/Soli) in Übersicht, Eingänge, Jahr und Rückblick
 
 ### 3.0.0 – 27.11.2026
 - 🧭 Neue Ausrichtung als **Fixkosten-Analyse**: Hauptzahl „Frei nach Fixkosten“, Geldfluss-Karte, Fixquote
